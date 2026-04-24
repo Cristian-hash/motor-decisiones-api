@@ -4,6 +4,9 @@ package com.arquitecura.motor_decisiones.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Table(name="usuarios")
@@ -21,6 +24,10 @@ public class Usuario {
 
     @Column(name="fecha_registro")
     private LocalDateTime fechaRegistro;
+
+    //  1 Usuario tiene Muchos Progresos
+    @OneToMany (mappedBy = "usuario",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Progreso> progresos= new ArrayList<>();
 
     public Usuario(){
         this.fechaRegistro = LocalDateTime.now();
@@ -56,5 +63,13 @@ public class Usuario {
 
     public void setFechaRegistro(LocalDateTime fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
+    }
+
+    public List<Progreso> getProgresos() {
+        return progresos;
+    }
+
+    public void setProgresos(List<Progreso> progresos) {
+        this.progresos = progresos;
     }
 }

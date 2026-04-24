@@ -3,6 +3,9 @@ package com.arquitecura.motor_decisiones.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="patrones")
 public class Patron {
@@ -18,6 +21,10 @@ public class Patron {
 
     @Column(length = 500)
     private String descripcionCorta;
+
+    //1 patron tiene muchas lecciones
+    @OneToMany(mappedBy="patron",cascade= CascadeType.ALL,orphanRemoval = true)
+    private List<Leccion> lecciones= new ArrayList<>();
 
     public Patron(){}
 
@@ -51,5 +58,13 @@ public class Patron {
 
     public void setDescripcionCorta(String descripcionCorta) {
         this.descripcionCorta = descripcionCorta;
+    }
+
+    public List<Leccion> getLecciones() {
+        return lecciones;
+    }
+
+    public void setLecciones(List<Leccion> lecciones) {
+        this.lecciones = lecciones;
     }
 }

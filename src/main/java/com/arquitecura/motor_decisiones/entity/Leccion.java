@@ -2,6 +2,9 @@ package com.arquitecura.motor_decisiones.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="lecciones")
 public class Leccion {
@@ -27,6 +30,9 @@ public class Leccion {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patron_id",nullable = false)
     private Patron patron;
+
+    @OneToMany(mappedBy = "leccion",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<OpcionRespuesta> opciones = new ArrayList<>();
 
     public Leccion(){}
 
@@ -84,5 +90,13 @@ public class Leccion {
 
     public void setPatron(Patron patron) {
         this.patron = patron;
+    }
+
+    public List<OpcionRespuesta> getOpciones() {
+        return opciones;
+    }
+
+    public void setOpciones(List<OpcionRespuesta> opciones) {
+        this.opciones = opciones;
     }
 }

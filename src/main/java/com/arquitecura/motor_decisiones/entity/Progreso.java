@@ -3,8 +3,11 @@ package com.arquitecura.motor_decisiones.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Table(name="progresos")
 public class Progreso {
 
     @Id
@@ -19,7 +22,6 @@ public class Progreso {
 
     private LocalDateTime fechaIntento;
 
-    //RE
     @ManyToOne(fetch= FetchType.LAZY)
     @JoinColumn(name="usuario_id",nullable = false)
     private Usuario usuario;
