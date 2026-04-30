@@ -1,10 +1,8 @@
-package com.arquitecura.motor_decisiones.entity;
+package com.arquitectura.motor_decisiones.entity;
 
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name="progresos")

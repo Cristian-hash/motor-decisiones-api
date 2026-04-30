@@ -1,4 +1,4 @@
-package com.arquitecura.motor_decisiones;
+package com.arquitectura.motor_decisiones;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

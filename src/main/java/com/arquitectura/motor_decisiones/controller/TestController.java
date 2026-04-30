@@ -1,4 +1,4 @@
-package com.arquitecura.motor_decisiones.controller;
+package com.arquitectura.motor_decisiones.controller;
 
 
 import org.springframework.web.bind.annotation.GetMapping;

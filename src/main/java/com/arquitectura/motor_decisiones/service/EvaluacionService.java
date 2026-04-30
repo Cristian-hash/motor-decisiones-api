@@ -1,16 +1,16 @@
-package com.arquitecura.motor_decisiones.service;
+package com.arquitectura.motor_decisiones.service;
 
-import com.arquitecura.motor_decisiones.dto.FeedbackDTO;
-import com.arquitecura.motor_decisiones.dto.RespuestaEstudianteDTO;
+import com.arquitectura.motor_decisiones.dto.FeedbackDTO;
+import com.arquitectura.motor_decisiones.dto.RespuestaEstudianteDTO;
 
-import com.arquitecura.motor_decisiones.entity.Leccion;
-import com.arquitecura.motor_decisiones.entity.OpcionRespuesta;
-import com.arquitecura.motor_decisiones.entity.Progreso;
-import com.arquitecura.motor_decisiones.entity.Usuario;
-import com.arquitecura.motor_decisiones.repository.LeccionRepository;
-import com.arquitecura.motor_decisiones.repository.OpcionRespuestaRepository;
-import com.arquitecura.motor_decisiones.repository.ProgresoRepository;
-import com.arquitecura.motor_decisiones.repository.UsuarioRepository;
+import com.arquitectura.motor_decisiones.entity.Leccion;
+import com.arquitectura.motor_decisiones.entity.OpcionRespuesta;
+import com.arquitectura.motor_decisiones.entity.Progreso;
+import com.arquitectura.motor_decisiones.entity.Usuario;
+import com.arquitectura.motor_decisiones.repository.LeccionRepository;
+import com.arquitectura.motor_decisiones.repository.OpcionRespuestaRepository;
+import com.arquitectura.motor_decisiones.repository.ProgresoRepository;
+import com.arquitectura.motor_decisiones.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

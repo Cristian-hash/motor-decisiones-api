@@ -1,4 +1,4 @@
-package com.arquitecura.motor_decisiones.entity;
+package com.arquitectura.motor_decisiones.entity;
 
 import jakarta.persistence.*;
 

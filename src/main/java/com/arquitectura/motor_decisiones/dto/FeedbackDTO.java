@@ -1,4 +1,4 @@
-package com.arquitecura.motor_decisiones.dto;
+package com.arquitectura.motor_decisiones.dto;
 
 public record FeedbackDTO(
         boolean esCorrecto,

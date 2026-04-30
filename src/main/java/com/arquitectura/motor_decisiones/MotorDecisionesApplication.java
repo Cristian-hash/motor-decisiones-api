@@ -1,4 +1,4 @@
-package com.arquitecura.motor_decisiones;
+package com.arquitectura.motor_decisiones;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

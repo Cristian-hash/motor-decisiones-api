@@ -1,6 +1,6 @@
-package com.arquitecura.motor_decisiones.repository;
+package com.arquitectura.motor_decisiones.repository;
 
-import com.arquitecura.motor_decisiones.entity.Progreso;
+import com.arquitectura.motor_decisiones.entity.Progreso;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
