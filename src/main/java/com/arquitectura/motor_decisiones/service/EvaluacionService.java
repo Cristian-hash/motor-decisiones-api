@@ -7,6 +7,7 @@ import com.arquitectura.motor_decisiones.entity.Leccion;
 import com.arquitectura.motor_decisiones.entity.OpcionRespuesta;
 import com.arquitectura.motor_decisiones.entity.Progreso;
 import com.arquitectura.motor_decisiones.entity.Usuario;
+import com.arquitectura.motor_decisiones.exception.RecursoNoEncontradoException;
 import com.arquitectura.motor_decisiones.repository.LeccionRepository;
 import com.arquitectura.motor_decisiones.repository.OpcionRespuestaRepository;
 import com.arquitectura.motor_decisiones.repository.ProgresoRepository;
@@ -39,13 +40,13 @@ public class EvaluacionService {
     public FeedbackDTO evaluarDecision(RespuestaEstudianteDTO dto){
         // 2. Extraer todos los datos necesarios abriendo las "cajas fuertes" (Optionals)
         OpcionRespuesta opcionSeleccionada = opcionRepository.findById(dto.opcionSeleccionadaId())
-                .orElseThrow(()->new RuntimeException("Error: opcion no encontrado"));
+                .orElseThrow(()->new RecursoNoEncontradoException("Error: opcion con id "+dto.opcionSeleccionadaId()+" no encontrada"));
 
         Usuario usuario = usuarioRepository.findById(dto.usuarioId()).
-                orElseThrow(()->new RuntimeException("Error: Usuario no encontrado"));
+                orElseThrow(()->new RecursoNoEncontradoException("Error: opcion con id "+dto.usuarioId()+" no encontrada"));
 
         Leccion leccion = leccionRepository.findById(dto.leccionId()).
-                orElseThrow(()-> new RuntimeException("Error: Leccion no encontrada"));
+                orElseThrow(()-> new RecursoNoEncontradoException("Error: opcion con id "+dto.leccionId()+" no encontrada"));
 
         // 3. Evaluar la regla de negocio
         boolean esCorrecto = opcionSeleccionada.getEsCorrecta();
