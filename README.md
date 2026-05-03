@@ -79,10 +79,10 @@ El proyecto se encuentra en desarrollo activo:
 * [x] **Fase 1:** Diseño de Arquitectura y Entidades
 * [x] **Fase 2:** Configuración de Persistencia (PostgreSQL + JPA)
 * [x] **Fase 3:** Repositorios + Endpoint base
-* [ ] **Fase 4:** Lógica de Negocio (Services) + DTOs *(En progreso)*
-* [ ] **Fase 5:** Seguridad (Spring Security + JWT)
-* [ ] **Fase 6:** CI/CD + Despliegue en la nube (Azure)
-
+- [x] **Fase 4:** Lógica de Negocio (Motor de evaluación), DTOs y Manejo Global de Excepciones
+- [ ] **Fase 5:** API de Lecciones Inteligentes (Siguiente paso)
+- [ ] **Fase 6:** Seguridad (Spring Security + JWT)
+- [ ] **Fase 7:** CI/CD + Despliegue en la nube (Azure)
 ---
 
 ## 🚦 Cómo levantar el proyecto en local
@@ -130,20 +130,38 @@ spring.jpa.hibernate.ddl-auto=update
 
 ---
 
-## 📡 Endpoint de prueba
+## 📡 Endpoints Principales
 
-Verifica que el sistema está activo:
-
+### 1️⃣ Health Check (Ping)
+Verifica que el recepcionista del servidor está vivo.
 ```http
 GET http://localhost:8080/api/v1/test/ping
-```
+
 
 ### ✅ Respuesta esperada
 
 ```
 ¡El Motor de Decisiones está vivo y escuchando a los Arquitectos!
 ```
+POST http://localhost:8080/api/v1/evaluaciones
+Content-Type: application/json
 
+{
+  "usuarioId": 1,
+  "leccionId": 1,
+  "opcionSeleccionadaId": 1
+}
+.....
+{
+  "esCorrecto": true,
+  "mensajeJustificacion": "¡Exacto! El patrón estrategia usa interfaces para delegar el comportamiento."
+}
+---
+{
+  "mensaje": "Error: Opción con ID 999 no encontrada",
+  "codigoEstado": 404,
+  "fecha": "2026-05-01T06:30:15.123"
+}
 ---
 
 ## 🧠 Filosofía del Sistema
@@ -157,12 +175,13 @@ Este proyecto está construido bajo una idea clave:
 
 ## 🧭 Enfoque Arquitectónico
 
-Este sistema sigue una regla clara:
+Este sistema está construido bajo principios SOLID y Arquitectura Limpia, siguiendo reglas inquebrantables:
 
-* **La lógica vive en los Services**
-* **Los Controllers exponen**
-* **Los Repositories acceden a datos**
-* **Las entidades representan el dominio**
+* **Responsabilidad Única por Capa:** * Los **Controllers** son "recepcionistas": solo traducen JSON a Java y delegan (máximo 3 líneas de código).
+    * Los **Services** son el "cerebro": aquí vive la lógica de evaluación, cálculo de puntos y transacciones (`@Transactional`).
+    * Los **Repositories** son la "memoria": interfaces que dialogan con PostgreSQL.
+* **Seguridad Fronteriza (DTOs):** Las entidades de la base de datos NUNCA viajan a internet. Se utilizan *Records* de Java (`RespuestaEstudianteDTO`, `FeedbackDTO`) para transportar solo la información necesaria.
+* **Manejo de Caos (Global Exception Handling):** El sistema está blindado con `@RestControllerAdvice`. Si un cliente envía datos inválidos, el sistema no colapsa (Error 500); en su lugar, intercepta la falla y devuelve una respuesta elegante y estructurada (Error 404/400).
 
 ---
 

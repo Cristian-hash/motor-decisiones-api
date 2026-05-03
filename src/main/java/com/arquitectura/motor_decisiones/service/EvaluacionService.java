@@ -13,6 +13,7 @@ import com.arquitectura.motor_decisiones.repository.OpcionRespuestaRepository;
 import com.arquitectura.motor_decisiones.repository.ProgresoRepository;
 import com.arquitectura.motor_decisiones.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -37,6 +38,7 @@ public class EvaluacionService {
         this.progresoRepository = progresoRepository;
     }
 
+    @Transactional // Garantiza que si falla el guardado, no haya datos inconsistentes
     public FeedbackDTO evaluarDecision(RespuestaEstudianteDTO dto){
         // 2. Extraer todos los datos necesarios abriendo las "cajas fuertes" (Optionals)
         OpcionRespuesta opcionSeleccionada = opcionRepository.findById(dto.opcionSeleccionadaId())
