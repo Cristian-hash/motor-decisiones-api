@@ -61,7 +61,7 @@ public class EvaluacionService {
         nuevoProgreso.setLeccion(leccion);
         nuevoProgreso.setFechaIntento(LocalDateTime.now());
         nuevoProgreso.setCompletado(esCorrecto);
-        nuevoProgreso.setPuntajeObtenido(esCorrecto?leccion.getPuntosrecompensa():0);
+        nuevoProgreso.setPuntajeObtenido(esCorrecto?leccion.getPuntosRecompensa():0);
         nuevoProgreso.setNivelAlcanzado("Principiante");
         //5. se guarda el progreso
         progresoRepository.save(nuevoProgreso);

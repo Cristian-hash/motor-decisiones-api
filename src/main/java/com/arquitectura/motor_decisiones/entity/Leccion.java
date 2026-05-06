@@ -32,7 +32,7 @@ public class Leccion {
     private Patron patron;
 
     @Column(nullable = false, columnDefinition = "int default 10")
-    private Integer puntosrecompensa=10;
+    private Integer puntosRecompensa =10;
 
     @OneToMany(mappedBy = "leccion",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<OpcionRespuesta> opciones = new ArrayList<>();
@@ -103,8 +103,8 @@ public class Leccion {
         this.opciones = opciones;
     }
 
-    public Integer getPuntosrecompensa() {return puntosrecompensa;
+    public Integer getPuntosRecompensa() {return puntosRecompensa;
     }
-    public void setPuntosrecompensa(Integer puntosrecompensa) {this.puntosrecompensa = puntosrecompensa;
+    public void setPuntosRecompensa(Integer puntosRecompensa) {this.puntosRecompensa = puntosRecompensa;
     }
 }
