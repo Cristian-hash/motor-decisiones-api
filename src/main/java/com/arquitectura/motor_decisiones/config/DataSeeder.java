@@ -35,10 +35,46 @@ public class DataSeeder {
             Leccion leccion= new Leccion();
             leccion.setTitulo("Cómo eliminar los Ifs gigante");
             leccion.setPatron(strategy);
-            leccion.setProblemaHook("Tienes un sistema de pagos con una clase llena de 'if' gigantes para decidir si cobrar con Tarjeta, PayPal o Crypto. Cada vez que agregas un nuevo método, corres el riesgo de romper todo el archivo.");
-            leccion.setMetafora("Ir al trabajo. Puedes ir en Auto, Bus o Bicicleta. Tu destino es el mismo, pero tu 'estrategia de viaje' cambia dependiendo del tráfico o el clima.");
-            leccion.setPseudocodigo("1. Crea una Interfaz 'EstrategiaPago'.\\n2. Crea clases que implementen esa interfaz (PagoTarjeta, PagoPaypal).\\n3. La clase principal solo llama a estrategia.pagar(), sin saber los detalles.");
-            leccion.setCodigoJava("public interface PaymentStrategy {\\n    void pay(int amount);\\n}\\n\\n// Implementaciones concretas...\\n");
+
+            // Usamos bloques de texto de Java (comillas triples) para mantener el formato visual aquí
+            leccion.setProblemaHook("""
+            **El Problema:**
+            Tienes un sistema de pagos donde el código se ve así:
+            if (tipo == "VISA") { ... } else if (tipo == "PAYPAL") { ... }`
+            
+            Cada vez que agregas un método nuevo, el archivo crece y el riesgo de errores aumenta exponencialmente.
+            """);
+            leccion.setMetafora("""
+            Imagina un **Gimnasio**:
+            * La **Estrategia** es tu rutina (Cardio, Pesas, Yoga).
+            * El **Contexto** eres tú.
+            * Tú decides qué rutina aplicar hoy sin cambiar quién eres.
+            """);
+
+            leccion.setPseudocodigo("""
+            ```text
+            1. Definir Interfaz Estrategia
+            2. Crear Clase PagoTarjeta implementa Estrategia
+            3. Crear Clase PagoEfectivo implementa Estrategia
+            4. El Cliente usa la interfaz, no la clase concreta
+            ```
+            """);
+
+            leccion.setCodigoJava("""
+            ```java
+            public interface EstrategiaPago {
+            void procesar(int monto);
+            }
+    
+            public class PagoTarjeta implements EstrategiaPago {
+                @Override
+                public void procesar(int monto) {
+                    System.out.println("Cobrando " + monto + " a la tarjeta.");
+                }
+            }
+            ```
+            """);
+
             leccion.setPuntosRecompensa(100);
             leccionRepository.save(leccion);
 
