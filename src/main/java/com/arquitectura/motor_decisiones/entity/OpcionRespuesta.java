@@ -3,7 +3,7 @@ package com.arquitectura.motor_decisiones.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Opciones_respuesta")
+@Table(name = "opciones_respuesta")
 public class OpcionRespuesta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
