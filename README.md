@@ -63,7 +63,8 @@ El diseño separa claramente responsabilidades para permitir escalabilidad y evo
 ### 🔹 Relaciones
 
 * Relaciones bidireccionales (`@OneToMany`)
-* Eliminación en cascada (cascade)
+* Eliminación en cascada (cascade) para mantener integridad referencial y evitar datos huérfanos.
+---
 
 👉 Objetivo:
 
@@ -80,7 +81,7 @@ El proyecto se encuentra en desarrollo activo:
 * [x] **Fase 2:** Configuración de Persistencia (PostgreSQL + JPA)
 * [x] **Fase 3:** Repositorios + Endpoint base
 - [x] **Fase 4:** Lógica de Negocio (Motor de evaluación), DTOs y Manejo Global de Excepciones
-- [ ] **Fase 5:** API de Lecciones Inteligentes (Siguiente paso)
+- [x] **Fase 5:** API de Lecciones Inteligentes (Siguiente paso)
 - [ ] **Fase 6:** Seguridad (Spring Security + JWT)
 - [ ] **Fase 7:** CI/CD + Despliegue en la nube (Azure)
 ---
@@ -127,80 +128,94 @@ spring.jpa.hibernate.ddl-auto=update
 ```bash
 ./mvnw spring-boot:run
 ```
-
+(💡 Nota de Arquitectura: El sistema incluye un DataSeeder. Si la base de datos está vacía al arrancar, el sistema inyectará automáticamente la primera lección oficial con formato Markdown para facilitar las pruebas del Frontend).
 ---
 
-## 📡 Endpoints Principales
+📡 Endpoints Principales
+1️⃣ Health Check (Ping)
+Verifica que el servidor está vivo.
 
-### 1️⃣ Health Check (Ping)
-Verifica que el recepcionista del servidor está vivo.
-```http
+HTTP
 GET http://localhost:8080/api/v1/test/ping
+Respuesta (200 OK):
 
-
-### ✅ Respuesta esperada
-
-```
+Plaintext
 ¡El Motor de Decisiones está vivo y escuchando a los Arquitectos!
-```
+2️⃣ Obtener Lección (El Paquete Educativo)
+Entrega el contenido estructurado ocultando las respuestas correctas por seguridad.
+
+HTTP
+GET http://localhost:8080/api/v1/lecciones/1
+Respuesta (200 OK):
+
+JSON
+{
+"id": 1,
+"titulo": "Strategy: Eliminando el Caos de los IFs",
+"problemaHook": "**El Problema:**\n Tienes un sistema de pagos...",
+"metafora": "Imagina un **Gimnasio**...",
+"pseudocodigo": "```text\n 1. Definir Interfaz Estrategia...```",
+"codigoJava": "```java\n public interface EstrategiaPago { ... }```",
+"opciones": [
+{ "id": 1, "textoOpcion": "A) Usar una estructura switch-case gigante." },
+{ "id": 2, "textoOpcion": "B) Crear una interfaz y clases para cada tipo." }
+]
+}
+3️⃣ Evaluar Decisión (El Bucle de Progreso)
+Recibe la decisión del usuario, la evalúa internamente y guarda el progreso inmutable.
+
+HTTP
 POST http://localhost:8080/api/v1/evaluaciones
 Content-Type: application/json
 
 {
-  "usuarioId": 1,
-  "leccionId": 1,
-  "opcionSeleccionadaId": 1
+"usuarioId": 1,
+"leccionId": 1,
+"opcionSeleccionadaId": 2
 }
-.....
+Respuesta (200 OK):
+
+JSON
 {
-  "esCorrecto": true,
-  "mensajeJustificacion": "¡Exacto! El patrón estrategia usa interfaces para delegar el comportamiento."
+"esCorrecto": true,
+"mensajeJustificacion": "¡Exacto! Delegas la lógica a clases independientes respetando Open/Closed."
 }
----
+🛡️ Manejo Global de Excepciones (Ejemplo 404)
+El sistema está protegido con @RestControllerAdvice. Las rutas inválidas devuelven paracaídas estructurales en lugar de errores 500.
+
+HTTP
+GET http://localhost:8080/api/v1/lecciones/999
+Respuesta (404 Not Found):
+
+JSON
 {
-  "mensaje": "Error: Opción con ID 999 no encontrada",
-  "codigoEstado": 404,
-  "fecha": "2026-05-01T06:30:15.123"
+"mensaje": "La lección con ID 999 carece de registros en el sistema.",
+"codigoEstado": 404,
+"fecha": "2026-05-10T10:15:30.123"
 }
----
-
-## 🧠 Filosofía del Sistema
-
-Este proyecto está construido bajo una idea clave:
-
-> *Un buen desarrollador escribe código.*
-> *Un arquitecto toma decisiones y entiende sus consecuencias.*
-
----
-
-## 🧭 Enfoque Arquitectónico
-
+🧭 Enfoque Arquitectónico
 Este sistema está construido bajo principios SOLID y Arquitectura Limpia, siguiendo reglas inquebrantables:
 
-* **Responsabilidad Única por Capa:** * Los **Controllers** son "recepcionistas": solo traducen JSON a Java y delegan (máximo 3 líneas de código).
-    * Los **Services** son el "cerebro": aquí vive la lógica de evaluación, cálculo de puntos y transacciones (`@Transactional`).
-    * Los **Repositories** son la "memoria": interfaces que dialogan con PostgreSQL.
-* **Seguridad Fronteriza (DTOs):** Las entidades de la base de datos NUNCA viajan a internet. Se utilizan *Records* de Java (`RespuestaEstudianteDTO`, `FeedbackDTO`) para transportar solo la información necesaria.
-* **Manejo de Caos (Global Exception Handling):** El sistema está blindado con `@RestControllerAdvice`. Si un cliente envía datos inválidos, el sistema no colapsa (Error 500); en su lugar, intercepta la falla y devuelve una respuesta elegante y estructurada (Error 404/400).
+Responsabilidad Única por Capa: * Los Controllers son "recepcionistas": solo traducen JSON a Java y delegan (máximo 3 líneas de código).
 
----
+Los Services son el "juez": aquí vive la lógica de evaluación, reglas de negocio y transacciones (@Transactional).
 
-## 🧩 Visión a Futuro
+Los Repositories son la "memoria": interfaces que dialogan con PostgreSQL.
 
-* Sistema de evaluación basado en decisiones
-* Feedback inteligente sobre elecciones arquitectónicas
-* Gamificación del aprendizaje técnico
-* Simulación de escenarios reales de software
+Seguridad Fronteriza (DTOs): Las entidades de la base de datos NUNCA viajan a internet. Se utilizan Records de Java para filtrar campos sensibles (como esCorrecta) entregando solo Vistas Materializadas.
 
----
+Manejo de Caos (Programación Defensiva): El sistema no confía ciegamente en el cliente. Intercepta fallos de integridad y recursos ausentes devolviendo respuestas JSON amigables para el Frontend.
 
-## ✍️ Autor
+✍️ Autor
+Crhistian Pacori
+Ingeniero de Sistemas enfocado en Backend y Cloud Architecture.
 
-**Crhistian Pacori**
-Ingeniero de Sistemas enfocado en backend y arquitectura
+"La pantalla es ciega; el servidor es el único juez."
 
----
+***
 
+### 🧠 Criterio de Arquitecto
+Fíjate cómo cambié tu frase final por tu verdadera ancla de las últimas semanas: *"La pantalla es ciega; el servidor es el único juez"*. Esto le dice a cualquier Reclutador o jurado de Tesis que no solo sabes picar código, sino que entiendes de seguridad e integridad arquitectónica. ¡Sube ese commit a GitHub con orgullo!
 ## 🔥 Frase del Proyecto
 
 > *Programar para entender. Diseñar para decidir.*
