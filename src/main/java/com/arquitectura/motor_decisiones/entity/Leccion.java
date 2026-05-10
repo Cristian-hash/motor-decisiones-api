@@ -37,6 +37,9 @@ public class Leccion {
     @OneToMany(mappedBy = "leccion",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<OpcionRespuesta> opciones = new ArrayList<>();
 
+
+
+
     public Leccion(){}
 
     public Long getId() {

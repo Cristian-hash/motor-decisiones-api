@@ -11,8 +11,9 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RecursoNoEncontradoException.class)
-    public ResponseEntity<ErrorResponseDTO> manejarRecursoNoEncontrado(RecursoNoEncontradoException ex){
+    @ExceptionHandler(RecursoAusenteException.class)
+    public ResponseEntity<ErrorResponseDTO> manejarRecursoNoEncontrado(RecursoAusenteException ex){
+
         ErrorResponseDTO error = new ErrorResponseDTO(
                 ex.getMessage(),
                 HttpStatus.NOT_FOUND.value(),
