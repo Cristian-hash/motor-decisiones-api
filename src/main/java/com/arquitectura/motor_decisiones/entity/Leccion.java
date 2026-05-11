@@ -1,5 +1,6 @@
 package com.arquitectura.motor_decisiones.entity;
 
+import com.arquitectura.motor_decisiones.enums.TipoEvaluacion;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -37,8 +38,9 @@ public class Leccion {
     @OneToMany(mappedBy = "leccion",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<OpcionRespuesta> opciones = new ArrayList<>();
 
-
-
+    @Enumerated(EnumType.STRING)
+    @Column(name="tipo_evaluacion",nullable=false)
+    private TipoEvaluacion tipoEvaluacion = TipoEvaluacion.OPCION_UNICA;
 
     public Leccion(){}
 
@@ -110,4 +112,13 @@ public class Leccion {
     }
     public void setPuntosRecompensa(Integer puntosRecompensa) {this.puntosRecompensa = puntosRecompensa;
     }
+
+    public TipoEvaluacion getTipoEvaluacion() {
+        return tipoEvaluacion;
+    }
+
+    public void setTipoEvaluacion(TipoEvaluacion tipoEvaluacion) {
+        this.tipoEvaluacion = tipoEvaluacion;
+    }
+
 }
