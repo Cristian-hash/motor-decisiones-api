@@ -42,6 +42,11 @@ public class Leccion {
     @Column(name="tipo_evaluacion",nullable=false)
     private TipoEvaluacion tipoEvaluacion = TipoEvaluacion.OPCION_UNICA;
 
+
+    @OneToMany(mappedBy = "Leccion",cascade=CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Opcion> opciones = new ArrayList<>();
+
+
     public Leccion(){}
 
     public Long getId() {
