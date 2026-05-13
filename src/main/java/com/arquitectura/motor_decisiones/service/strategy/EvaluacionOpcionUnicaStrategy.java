@@ -5,10 +5,16 @@ import com.arquitectura.motor_decisiones.dto.FeedbackDTO;
 import com.arquitectura.motor_decisiones.dto.RespuestaEstudianteDTO;
 import com.arquitectura.motor_decisiones.entity.Leccion;
 import com.arquitectura.motor_decisiones.entity.OpcionRespuesta;
+import com.arquitectura.motor_decisiones.enums.TipoEvaluacion;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EvaluacionOpcionUnicaStrategy implements EstrategiaEvaluacion {
+
+    @Override
+    public TipoEvaluacion getTipo(){
+        return TipoEvaluacion.OPCION_UNICA;
+    }
 
     @Override
     public FeedbackDTO evaluar(RespuestaEstudianteDTO respuesta, Leccion leccion){

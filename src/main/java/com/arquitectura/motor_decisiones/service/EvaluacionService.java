@@ -7,18 +7,23 @@ import com.arquitectura.motor_decisiones.entity.Leccion;
 import com.arquitectura.motor_decisiones.entity.OpcionRespuesta;
 import com.arquitectura.motor_decisiones.entity.Progreso;
 import com.arquitectura.motor_decisiones.entity.Usuario;
+import com.arquitectura.motor_decisiones.enums.TipoEvaluacion;
 import com.arquitectura.motor_decisiones.exception.RecursoNoEncontradoException;
 import com.arquitectura.motor_decisiones.repository.LeccionRepository;
 import com.arquitectura.motor_decisiones.repository.OpcionRespuestaRepository;
 import com.arquitectura.motor_decisiones.repository.ProgresoRepository;
 import com.arquitectura.motor_decisiones.repository.UsuarioRepository;
+import com.arquitectura.motor_decisiones.service.strategy.EstrategiaEvaluacion;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 public class EvaluacionService {
+    //1 Agenda de especialistas
+    private final Map<TipoEvaluacion, EstrategiaEvaluacion> estrategias;
 
     //1RO TRAERME EL REPOSITORY
     private final OpcionRespuestaRepository opcionRepository;
@@ -26,7 +31,9 @@ public class EvaluacionService {
     private final LeccionRepository leccionRepository;
     private final ProgresoRepository progresoRepository;
 
+
     public EvaluacionService(
+
             OpcionRespuestaRepository opcionRepository,
             UsuarioRepository usuarioRepository,
             LeccionRepository leccionRepository,
