@@ -14,11 +14,14 @@ import com.arquitectura.motor_decisiones.repository.OpcionRespuestaRepository;
 import com.arquitectura.motor_decisiones.repository.ProgresoRepository;
 import com.arquitectura.motor_decisiones.repository.UsuarioRepository;
 import com.arquitectura.motor_decisiones.service.strategy.EstrategiaEvaluacion;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class EvaluacionService {
@@ -26,54 +29,58 @@ public class EvaluacionService {
     private final Map<TipoEvaluacion, EstrategiaEvaluacion> estrategias;
 
     //1RO TRAERME EL REPOSITORY
-    private final OpcionRespuestaRepository opcionRepository;
+    // private final OpcionRespuestaRepository opcionRepository;
     private final UsuarioRepository usuarioRepository;
     private final LeccionRepository leccionRepository;
     private final ProgresoRepository progresoRepository;
 
-
+    @Autowired
     public EvaluacionService(
-
-            OpcionRespuestaRepository opcionRepository,
-            UsuarioRepository usuarioRepository,
-            LeccionRepository leccionRepository,
-            ProgresoRepository progresoRepository
+        List<EstrategiaEvaluacion> estrategiaList,
+        //OpcionRespuestaRepository opcionRepository,
+        UsuarioRepository usuarioRepository,
+        LeccionRepository leccionRepository,
+        ProgresoRepository progresoRepository
     ){
-        this.opcionRepository  = opcionRepository;
+        //this.opcionRepository  = opcionRepository;
         this.usuarioRepository = usuarioRepository;
         this.leccionRepository = leccionRepository;
         this.progresoRepository = progresoRepository;
+
+        this.estrategias= estrategiaList.stream()
+                .collect(Collectors.toMap(
+                        estrategia -> estrategia.getTipo(),
+                        estrategia -> estrategia
+                ));
     }
 
     @Transactional // Garantiza que si falla el guardado, no haya datos inconsistentes
     public FeedbackDTO evaluarDecision(RespuestaEstudianteDTO dto){
-        // 2. Extraer todos los datos necesarios abriendo las "cajas fuertes" (Optionals)
-        OpcionRespuesta opcionSeleccionada = opcionRepository.findById(dto.opcionSeleccionadaId())
-                .orElseThrow(()->new RecursoNoEncontradoException("Error: opcion con id "+dto.opcionSeleccionadaId()+" no encontrada"));
 
+        // 1. Extraer los datos básicos
         Usuario usuario = usuarioRepository.findById(dto.usuarioId()).
                 orElseThrow(()->new RecursoNoEncontradoException("Error: opcion con id "+dto.usuarioId()+" no encontrada"));
 
         Leccion leccion = leccionRepository.findById(dto.leccionId()).
                 orElseThrow(()-> new RecursoNoEncontradoException("Error: opcion con id "+dto.leccionId()+" no encontrada"));
 
-        // 3. Evaluar la regla de negocio
-        boolean esCorrecto = opcionSeleccionada.getEsCorrecta();
-        String mensaje = opcionSeleccionada.getJustificacionFeedback();
+        // 2. ORQUESTAR: Buscar al especialista en la agenda según el tipo de lección
+        EstrategiaEvaluacion estrategia = estrategias.get(leccion.getTipoEvaluacion());
 
-        // 4. Crear la huella histórica (Persistencia)
+        // 3. DELEGAR LA LÓGICA (La estrategia se encarga de buscar la OpcionRespuesta y evaluarla)
+        FeedbackDTO feedback= estrategia.evaluar(dto,leccion);
 
+        // 4. GUARDAR EL PROGRESO (Usamos el resultado que nos devolvió el especialista)
         Progreso nuevoProgreso=new Progreso();
         nuevoProgreso.setUsuario(usuario);
         nuevoProgreso.setLeccion(leccion);
         nuevoProgreso.setFechaIntento(LocalDateTime.now());
-        nuevoProgreso.setCompletado(esCorrecto);
-        nuevoProgreso.setPuntajeObtenido(esCorrecto?leccion.getPuntosRecompensa():0);
+        nuevoProgreso.setCompletado(feedback.esCorrecto());
+        nuevoProgreso.setPuntajeObtenido(feedback.esCorrecto()?leccion.getPuntosRecompensa():0);
         nuevoProgreso.setNivelAlcanzado("Principiante");
         //5. se guarda el progreso
         progresoRepository.save(nuevoProgreso);
-
-        //6. Se le empaqueta en un dto y se le envia al front
-        return new FeedbackDTO(esCorrecto,mensaje);
+        // 6. Retornar al Front
+        return feedback;
     }
 }
