@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProgresoRepository extends JpaRepository<Progreso,Long> {
+    boolean existByUsuarioByIdAndLeccionIdAndCompletadoTrue(Long usuarioId,Long leccionId);
 }
