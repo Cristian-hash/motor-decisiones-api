@@ -17,7 +17,7 @@ public class EvaluacionController {
         this.evaluacionService=evaluacionService;
     }
 
-    @PostMapping
+    @PostMapping("/decidir")
     public ResponseEntity<FeedbackDTO> evaluar(@RequestBody RespuestaEstudianteDTO dto){
         FeedbackDTO respuesta= evaluacionService.evaluarDecision(dto);
         return ResponseEntity.ok(respuesta);

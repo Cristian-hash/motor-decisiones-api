@@ -35,7 +35,7 @@ public class Leccion {
     @Column(nullable = false, columnDefinition = "int default 10")
     private Integer puntosRecompensa =10;
 
-    @OneToMany(mappedBy = "leccion",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "leccion",cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<OpcionRespuesta> opciones = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -43,8 +43,7 @@ public class Leccion {
     private TipoEvaluacion tipoEvaluacion = TipoEvaluacion.OPCION_UNICA;
 
 
-    @OneToMany(mappedBy = "Leccion",cascade=CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<Opcion> opciones = new ArrayList<>();
+
 
 
     public Leccion(){}
