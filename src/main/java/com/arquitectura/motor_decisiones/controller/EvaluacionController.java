@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/evaluaciones")
 public class EvaluacionController {
     private EvaluacionService evaluacionService;
-    public EvaluacionController(EvaluacionService evaluacionService){
-        this.evaluacionService=evaluacionService;
+
+    public EvaluacionController(EvaluacionService evaluacionService) {
+        this.evaluacionService = evaluacionService;
     }
 
     @PostMapping("/decidir")
-    public ResponseEntity<FeedbackDTO> evaluar(@RequestBody RespuestaEstudianteDTO dto){
-        FeedbackDTO respuesta= evaluacionService.evaluarDecision(dto);
+    public ResponseEntity<FeedbackDTO> evaluar(@RequestBody RespuestaEstudianteDTO dto) {
+        FeedbackDTO respuesta = evaluacionService.evaluarDecision(dto);
         return ResponseEntity.ok(respuesta);
     }
 }

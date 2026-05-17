@@ -2,7 +2,7 @@ package com.arquitectura.motor_decisiones.dto;
 
 import java.util.List;
 
-public record LeccionCompletaDTO (
+public record LeccionCompletaDTO(
 
         Long id,
         String titulo,
@@ -12,5 +12,5 @@ public record LeccionCompletaDTO (
         String codigoJava,
         List<OpcionRespuestaDTO> opciones
 
-){
+) {
 }

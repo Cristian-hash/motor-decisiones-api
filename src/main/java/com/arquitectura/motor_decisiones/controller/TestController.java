@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/test")
 public class TestController {
     @GetMapping("/ping")
-    public String ping(){
+    public String ping() {
         return "¡El Motor de Decisiones está vivo y escuchando a los Arquitectos!";
     }
 }

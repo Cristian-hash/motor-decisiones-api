@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class LeccionController {
     private final LeccionService leccionService;
-    public LeccionController(LeccionService leccionService){
-        this.leccionService=leccionService;
+
+    public LeccionController(LeccionService leccionService) {
+        this.leccionService = leccionService;
     }
 
     @GetMapping("/{id}")
-    public LeccionCompletaDTO getLeccion(@PathVariable Long id){
+    public LeccionCompletaDTO getLeccion(@PathVariable Long id) {
         return leccionService.obtenerLeccionPorId(id);
     }
 }

@@ -9,27 +9,27 @@ import java.util.List;
 
 
 @Entity
-@Table(name="usuarios")
+@Table(name = "usuarios")
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,unique = true,length = 100)
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
-    @Column(name="fecha_registro")
+    @Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
     //  1 Usuario tiene Muchos Progresos
-    @OneToMany (mappedBy = "usuario",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Progreso> progresos= new ArrayList<>();
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Progreso> progresos = new ArrayList<>();
 
-    public Usuario(){
+    public Usuario() {
         this.fechaRegistro = LocalDateTime.now();
     }
 

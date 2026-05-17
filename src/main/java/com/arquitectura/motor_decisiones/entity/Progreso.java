@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="progresos")
+@Table(name = "progresos")
 public class Progreso {
 
     @Id
@@ -20,20 +20,20 @@ public class Progreso {
 
     private LocalDateTime fechaIntento;
 
-    @ManyToOne(fetch= FetchType.LAZY)
-    @JoinColumn(name="usuario_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
     //muchos progresos tienen en 1 leccion,(ejem:el proreso de maria, el progreso de jose,el de pedro en esa leccion)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="leccion_id",nullable=false)
+    @JoinColumn(name = "leccion_id", nullable = false)
     private Leccion leccion;
 
     @Column(nullable = false)
     private Boolean completado;
 
-    public Progreso(){
-        this.fechaIntento=LocalDateTime.now();
+    public Progreso() {
+        this.fechaIntento = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -76,11 +76,19 @@ public class Progreso {
         this.usuario = usuario;
     }
 
-    public Leccion getLeccion() {return leccion;}
+    public Leccion getLeccion() {
+        return leccion;
+    }
 
-    public void setLeccion(Leccion leccion) {this.leccion = leccion; }
+    public void setLeccion(Leccion leccion) {
+        this.leccion = leccion;
+    }
 
-    public Boolean getCompletado() {return completado;}
+    public Boolean getCompletado() {
+        return completado;
+    }
 
-    public void setCompletado(Boolean completado) {this.completado = completado;}
+    public void setCompletado(Boolean completado) {
+        this.completado = completado;
+    }
 }

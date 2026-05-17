@@ -17,63 +17,63 @@ public class DataSeeder {
     CommandLineRunner initData(
             PatronRepository patronRepository,
             LeccionRepository leccionRepository,
-            OpcionRespuestaRepository opcionRespuestaRepository){
-        return args ->{
+            OpcionRespuestaRepository opcionRespuestaRepository) {
+        return args -> {
             // Regla de oro: Solo inyectar si la base de datos está vacía
-        if(patronRepository.count()>0){
-            return;
-        }
-        System.out.println("Sembrando la Base de Datos con el Patrón Strategy...");
+            if (patronRepository.count() > 0) {
+                return;
+            }
+            System.out.println("Sembrando la Base de Datos con el Patrón Strategy...");
 
-        //1. Construir el Patrón
-            Patron strategy=new Patron();
+            //1. Construir el Patrón
+            Patron strategy = new Patron();
             strategy.setNombre("Strategy");
             strategy.setTipo("Patrones de Comportamiento");
             strategy.setDescripcionCorta("Permite intercambiar algoritmos (comportamientos) en tiempo de ejecución sin alterar el código cliente.");
             patronRepository.save(strategy);
-        //2. Construir la leccionn
-            Leccion leccion= new Leccion();
+            //2. Construir la leccionn
+            Leccion leccion = new Leccion();
             leccion.setTitulo("Cómo eliminar los Ifs gigante");
             leccion.setPatron(strategy);
 
             // Usamos bloques de texto de Java (comillas triples) para mantener el formato visual aquí
             leccion.setProblemaHook("""
-            **El Problema:**
-            Tienes un sistema de pagos donde el código se ve así:
-            if (tipo == "VISA") { ... } else if (tipo == "PAYPAL") { ... }`
-            
-            Cada vez que agregas un método nuevo, el archivo crece y el riesgo de errores aumenta exponencialmente.
-            """);
+                    **El Problema:**
+                    Tienes un sistema de pagos donde el código se ve así:
+                    if (tipo == "VISA") { ... } else if (tipo == "PAYPAL") { ... }`
+                    
+                    Cada vez que agregas un método nuevo, el archivo crece y el riesgo de errores aumenta exponencialmente.
+                    """);
             leccion.setMetafora("""
-            Imagina un **Gimnasio**:
-            * La **Estrategia** es tu rutina (Cardio, Pesas, Yoga).
-            * El **Contexto** eres tú.
-            * Tú decides qué rutina aplicar hoy sin cambiar quién eres.
-            """);
+                    Imagina un **Gimnasio**:
+                    * La **Estrategia** es tu rutina (Cardio, Pesas, Yoga).
+                    * El **Contexto** eres tú.
+                    * Tú decides qué rutina aplicar hoy sin cambiar quién eres.
+                    """);
 
             leccion.setPseudocodigo("""
-            ```text
-            1. Definir Interfaz Estrategia
-            2. Crear Clase PagoTarjeta implementa Estrategia
-            3. Crear Clase PagoEfectivo implementa Estrategia
-            4. El Cliente usa la interfaz, no la clase concreta
-            ```
-            """);
+                    ```text
+                    1. Definir Interfaz Estrategia
+                    2. Crear Clase PagoTarjeta implementa Estrategia
+                    3. Crear Clase PagoEfectivo implementa Estrategia
+                    4. El Cliente usa la interfaz, no la clase concreta
+                    ```
+                    """);
 
             leccion.setCodigoJava("""
-            ```java
-            public interface EstrategiaPago {
-            void procesar(int monto);
-            }
-    
-            public class PagoTarjeta implements EstrategiaPago {
-                @Override
-                public void procesar(int monto) {
-                    System.out.println("Cobrando " + monto + " a la tarjeta.");
-                }
-            }
-            ```
-            """);
+                    ```java
+                    public interface EstrategiaPago {
+                    void procesar(int monto);
+                    }
+                    
+                    public class PagoTarjeta implements EstrategiaPago {
+                        @Override
+                        public void procesar(int monto) {
+                            System.out.println("Cobrando " + monto + " a la tarjeta.");
+                        }
+                    }
+                    ```
+                    """);
 
             leccion.setPuntosRecompensa(100);
             leccionRepository.save(leccion);

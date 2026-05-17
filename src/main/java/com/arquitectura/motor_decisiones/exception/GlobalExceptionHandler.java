@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RecursoAusenteException.class)
-    public ResponseEntity<ErrorResponseDTO> manejarRecursoNoEncontrado(RecursoAusenteException ex){
+    public ResponseEntity<ErrorResponseDTO> manejarRecursoNoEncontrado(RecursoAusenteException ex) {
 
         ErrorResponseDTO error = new ErrorResponseDTO(
                 ex.getMessage(),

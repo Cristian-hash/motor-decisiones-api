@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name="patrones")
+@Table(name = "patrones")
 public class Patron {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String nombre;
 
     @Column(nullable = false)
@@ -23,10 +23,11 @@ public class Patron {
     private String descripcionCorta;
 
     //1 patron tiene muchas lecciones
-    @OneToMany(mappedBy="patron",cascade= CascadeType.ALL,orphanRemoval = true)
-    private List<Leccion> lecciones= new ArrayList<>();
+    @OneToMany(mappedBy = "patron", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Leccion> lecciones = new ArrayList<>();
 
-    public Patron(){}
+    public Patron() {
+    }
 
     public Long getId() {
         return id;

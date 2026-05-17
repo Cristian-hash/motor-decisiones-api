@@ -9,20 +9,21 @@ public class OpcionRespuesta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,length = 500)
+    @Column(nullable = false, length = 500)
     private String textoOpcion;
 
     @Column(nullable = false)
     private Boolean esCorrecta;
 
-    @Column(columnDefinition = "TEXT",nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String justificacionFeedback;
 
-    @ManyToOne(fetch =FetchType.LAZY)
-    @JoinColumn(name = "leccion_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "leccion_id", nullable = false)
     private Leccion leccion;
 
-    public OpcionRespuesta(){}
+    public OpcionRespuesta() {
+    }
 
     public Long getId() {
         return id;

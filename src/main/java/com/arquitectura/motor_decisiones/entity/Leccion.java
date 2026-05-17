@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name="lecciones")
+@Table(name = "lecciones")
 public class Leccion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,37 +16,35 @@ public class Leccion {
     @Column(nullable = false)
     private String titulo;
 
-    @Column(columnDefinition = "TEXT",nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String problemaHook;
 
-    @Column(columnDefinition = "TEXT",nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String metafora;
 
-    @Column(columnDefinition = "TEXT",nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String pseudocodigo;
 
-    @Column(columnDefinition = "TEXT",nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String codigoJava;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patron_id",nullable = false)
+    @JoinColumn(name = "patron_id", nullable = false)
     private Patron patron;
 
     @Column(nullable = false, columnDefinition = "int default 10")
-    private Integer puntosRecompensa =10;
+    private Integer puntosRecompensa = 10;
 
-    @OneToMany(mappedBy = "leccion",cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "leccion", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OpcionRespuesta> opciones = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @Column(name="tipo_evaluacion",nullable=false)
+    @Column(name = "tipo_evaluacion", nullable = false)
     private TipoEvaluacion tipoEvaluacion = TipoEvaluacion.OPCION_UNICA;
 
 
-
-
-
-    public Leccion(){}
+    public Leccion() {
+    }
 
     public Long getId() {
         return id;
@@ -112,9 +110,12 @@ public class Leccion {
         this.opciones = opciones;
     }
 
-    public Integer getPuntosRecompensa() {return puntosRecompensa;
+    public Integer getPuntosRecompensa() {
+        return puntosRecompensa;
     }
-    public void setPuntosRecompensa(Integer puntosRecompensa) {this.puntosRecompensa = puntosRecompensa;
+
+    public void setPuntosRecompensa(Integer puntosRecompensa) {
+        this.puntosRecompensa = puntosRecompensa;
     }
 
     public TipoEvaluacion getTipoEvaluacion() {

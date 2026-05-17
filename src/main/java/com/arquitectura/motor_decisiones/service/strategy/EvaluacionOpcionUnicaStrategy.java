@@ -12,30 +12,30 @@ import org.springframework.stereotype.Component;
 public class EvaluacionOpcionUnicaStrategy implements EstrategiaEvaluacion {
 
     @Override
-    public TipoEvaluacion getTipo(){
+    public TipoEvaluacion getTipo() {
         return TipoEvaluacion.OPCION_UNICA;
     }
 
     @Override
-    public FeedbackDTO evaluar(RespuestaEstudianteDTO respuesta, Leccion leccion){
+    public FeedbackDTO evaluar(RespuestaEstudianteDTO respuesta, Leccion leccion) {
 
         // 1. Buscamos la opción exacta que el estudiante seleccionó dentro de la lección
         OpcionRespuesta opcionSeleccionada = leccion.getOpciones().stream()
-                .filter(opcion->opcion.getId().equals(respuesta.opcionSeleccionadaId()))
+                .filter(opcion -> opcion.getId().equals(respuesta.opcionSeleccionadaId()))
                 .findFirst()
-                .orElseThrow(()->new IllegalArgumentException("La opción seleccionada no se encuentra en la lección"));
+                .orElseThrow(() -> new IllegalArgumentException("La opción seleccionada no se encuentra en la lección"));
 
         // 2. Evaluamos si es correcta usando TU getter
         boolean esCorrecta = opcionSeleccionada.getEsCorrecta();
         // 3. Extraemos el feedback específico usando TU getter
-        String mensajeFeedback= opcionSeleccionada.getJustificacionFeedback();
+        String mensajeFeedback = opcionSeleccionada.getJustificacionFeedback();
 
         // 4. Calculamos puntaje
-        int puntosObtenidos =  esCorrecta ? leccion.getPuntosRecompensa() : 0;
+        int puntosObtenidos = esCorrecta ? leccion.getPuntosRecompensa() : 0;
         // 5. Generamos el "Consejo Inteligente" (Inteligencia de negocio)
-        String consejoSiguientePaso=esCorrecta
-                ?"¡Excelente decisión! Tienes luz verde para avanzar al siguiente patrón de diseño."
-                :"Te recomendamos repasar los diagramas de esta lección antes de intentar tomar otra decisión.";
+        String consejoSiguientePaso = esCorrecta
+                ? "¡Excelente decisión! Tienes luz verde para avanzar al siguiente patrón de diseño."
+                : "Te recomendamos repasar los diagramas de esta lección antes de intentar tomar otra decisión.";
         // 5. Retornamos el DTO
         return new FeedbackDTO(
                 esCorrecta,
