@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
     private UsuarioRepository usuarioRepository;
-    public AuthService(UsuarioRepository usuarioRepository){
+    private JwtService jwtService;
+    public AuthService(UsuarioRepository usuarioRepository,JwtService jwtService){
         this.usuarioRepository=usuarioRepository;
+        this.jwtService=jwtService;
     }
 
     public AuthResponseDTO login(AuthRequestDTO request){
@@ -24,7 +26,7 @@ public class AuthService {
         }
         // 3. Si todo es correcto, generamos el "pasaporte"
         // (Hoy es un string simulado, pronto usaremos la llave maestra del application.properties)
-        String tokenSimulado = "simulacion.jwt.para_" + usuario.getEmail();
-        return new AuthResponseDTO(tokenSimulado);
+        String tokenReal = jwtService.generateToken(usuario);
+        return new AuthResponseDTO(tokenReal);
     }
 }
