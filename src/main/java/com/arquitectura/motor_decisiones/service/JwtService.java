@@ -1,6 +1,7 @@
 package com.arquitectura.motor_decisiones.service;
 
 import com.arquitectura.motor_decisiones.entity.Usuario;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -36,6 +37,11 @@ public class JwtService {
     private Key getSignInKey(){
         byte[] keyBytes = secretKey.getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    // 1. Extraer el email (Subject) del token
+    public String extracUsername(String token){
+        return extractClaim(token, Claims::getSubject);
     }
 
 }
