@@ -12,6 +12,8 @@ import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Date;
+import java.util.function.Function;
+
 @Service
 public class JwtService {
 
@@ -40,8 +42,30 @@ public class JwtService {
     }
 
     // 1. Extraer el email (Subject) del token
-    public String extracUsername(String token){
+    public String extractUsername(String token){
         return extractClaim(token, Claims::getSubject);
     }
+    // 2. Validar si el token pertenece a este usuario y no ha expirado
+    public boolean isTokenValid(String token,Usuario usuario){
+        final String username = extractUsername(token);
+        return (username.equals((usuario.getEmail()))&& !isTokenExpired(token));
+    }
+    // 3-Revisar si la fecha actual es mayor a la fecha de expiración
+    private boolean isTokenExpired(String token){
+        return extractExpiration(token).before(new Date());
+    }
 
+    private Date extractExpiration(String token){
+        return extractClaim(token,Claims::getExpiration);
+    }
+
+    // Método maestro para decodificar cualquier dato del Payload
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
+        final Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claimsResolver.apply(claims);
+    }
 }
