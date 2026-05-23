@@ -26,21 +26,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtService = jwtService;
         this.usuarioRepository = usuarioRepository;
     }
-
+    //0 Este metodo es la puerta principal, recibe la peticion, y decide si la deja continuar por la cadena de filtros
     @Override
     protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
+            @NonNull HttpServletRequest request,//El filtro recibe esa petición en request
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
+            @NonNull FilterChain filterChain//Cadena de filtros
     ) throws ServletException, IOException {
 
-        // 1. Buscar el Header "Authorization"
+        // 1. Estas líneas preparan y extraen la información inicial necesaria para identificar al usuario mediante JWT.
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
 
         // 2. Si no hay header o no empieza con "Bearer ", lo dejamos pasar.
         // (Spring Security lo bloqueará más adelante si la ruta es privada)
+        //2 mio Este bloque revisa si la petición trae un JWT con formato correcto y, si falta, permite que la petición siga su flujo normal para que Spring Security tome la decisión final.
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -52,7 +53,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 4. Extraemos el email desde el token
         userEmail = jwtService.extractUsername(jwt);
 
+
         // 5. Si hay un email y el usuario aún no está autenticado en el contexto actual
+        // 5. MIO Este bloque valida el JWT, verifica al usuario en la base de datos y registra oficialmente al usuario autenticado dentro de Spring Security.
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             // Buscamos al usuario en la base de datos
@@ -67,6 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         null,
                         null // Aquí irían los roles/autorizaciones, lo agregaremos después
                 );
+                //Agrega detalles extra del request: Por ejemplo: IP, sesión, origen
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 // 7. Le decimos a Spring Security: "Conozco a este tipo, déjalo pasar"
