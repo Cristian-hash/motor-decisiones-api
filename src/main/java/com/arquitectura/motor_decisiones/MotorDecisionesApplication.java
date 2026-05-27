@@ -294,3 +294,6 @@ vehiculo.viajar()
 
 👉 Strategy
  */
+
+//creacion de mi diagrama en
+//https://www.notion.so/SPRING-BOOT-ANGULAR-331a978ac3878032ba69e6ef14b380e1#331a978ac38780b9944ec5af3f3e62cb
