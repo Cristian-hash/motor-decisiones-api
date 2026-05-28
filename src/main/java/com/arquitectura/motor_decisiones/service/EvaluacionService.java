@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 public class EvaluacionService {
     //1 Agenda de especialistas
-    private final Map<TipoEvaluacion, EstrategiaEvaluacion> estrategias;
+    private final EvaluacionStrategyFactory factory;
 
     //1RO TRAERME EL REPOSITORY
     // private final OpcionRespuestaRepository opcionRepository;
@@ -34,22 +34,16 @@ public class EvaluacionService {
 
     @Autowired
     public EvaluacionService(
-            List<EstrategiaEvaluacion> estrategiaList,
+            EvaluacionStrategyFactory factory,
             UsuarioRepository usuarioRepository,
             LeccionRepository leccionRepository,
             ProgresoRepository progresoRepository
     ) {
+        this.factory = factory;
         this.usuarioRepository = usuarioRepository;
         this.leccionRepository = leccionRepository;
         this.progresoRepository = progresoRepository;
-
-        this.estrategias = estrategiaList.stream()
-                .collect(Collectors.toMap(
-                        estrategia -> estrategia.getTipo(),
-                        estrategia -> estrategia
-                ));
     }
-
     @Transactional // Garantiza que si falla el guardado, no haya datos inconsistentes
     public FeedbackDTO evaluarDecision(RespuestaEstudianteDTO dto) {
         //REGLA ANTIFRAUDE
@@ -70,7 +64,7 @@ public class EvaluacionService {
                 orElseThrow(() -> new RecursoNoEncontradoException("Error: opcion con id " + dto.leccionId() + " no encontrada"));
 
         // 2. ORQUESTAR: Buscar al especialista en la agenda según el tipo de lección
-        EstrategiaEvaluacion estrategia = estrategias.get(leccion.getTipoEvaluacion());
+            EstrategiaEvaluacion estrategia = factory.obtenerEstrategia(leccion.getTipoEvaluacion());
 
         // 3. DELEGAR LA LÓGICA (La estrategia se encarga de buscar la OpcionRespuesta y evaluarla)
         FeedbackDTO feedback = estrategia.evaluar(dto, leccion);
