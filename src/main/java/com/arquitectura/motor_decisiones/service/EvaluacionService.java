@@ -25,9 +25,6 @@ import java.util.stream.Collectors;
 public class EvaluacionService {
     //1 Agenda de especialistas
     private final EvaluacionStrategyFactory factory;
-
-    //1RO TRAERME EL REPOSITORY
-    // private final OpcionRespuestaRepository opcionRepository;
     private final UsuarioRepository usuarioRepository;
     private final LeccionRepository leccionRepository;
     private final ProgresoRepository progresoRepository;
