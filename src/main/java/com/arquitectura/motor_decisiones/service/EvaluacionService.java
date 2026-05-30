@@ -53,20 +53,20 @@ public class EvaluacionService {
             );
         }
 
-        // 1. Extraer los datos básicos
+        // 2. Extraer dato
         Usuario usuario = usuarioRepository.findById(dto.usuarioId()).
                 orElseThrow(() -> new RecursoNoEncontradoException("Error: opcion con id " + dto.usuarioId() + " no encontrada"));
 
         Leccion leccion = leccionRepository.findById(dto.leccionId()).
                 orElseThrow(() -> new RecursoNoEncontradoException("Error: opcion con id " + dto.leccionId() + " no encontrada"));
 
-        // 2. ORQUESTAR: Buscar al especialista en la agenda según el tipo de lección
+        // 3. ORQUESTAR: El Service pide la herramienta a la Fábrica
             EstrategiaEvaluacion estrategia = factory.obtenerEstrategia(leccion.getTipoEvaluacion());
 
-        // 3. DELEGAR LA LÓGICA (La estrategia se encarga de buscar la OpcionRespuesta y evaluarla)
+        // 4. DELEGAR: El Service ejecuta la herramienta
         FeedbackDTO feedback = estrategia.evaluar(dto, leccion);
 
-        // 4. GUARDAR EL PROGRESO (Usamos el resultado que nos devolvió el especialista)
+        // 5. GUARDAR PROGRESO (Intacto)
         Progreso nuevoProgreso = new Progreso();
         nuevoProgreso.setUsuario(usuario);
         nuevoProgreso.setLeccion(leccion);
@@ -74,9 +74,7 @@ public class EvaluacionService {
         nuevoProgreso.setCompletado(feedback.esCorrecto());
         nuevoProgreso.setPuntajeObtenido(feedback.esCorrecto() ? leccion.getPuntosRecompensa() : 0);
         nuevoProgreso.setNivelAlcanzado("Principiante");
-        //5. se guarda el progreso
         progresoRepository.save(nuevoProgreso);
-        // 6. Retornar al Front
         return feedback;
     }
 }

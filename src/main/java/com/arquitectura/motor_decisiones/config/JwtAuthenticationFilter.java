@@ -38,6 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
+        // 1. Ver si el header llega
+        System.out.println("HEADER AUTHORIZATION: " + authHeader);
 
         // 2. Si no hay header o no empieza con "Bearer ", lo dejamos pasar.
         // (Spring Security lo bloqueará más adelante si la ruta es privada)
@@ -53,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 4. Extraemos el email desde el token
         userEmail = jwtService.extractUsername(jwt);
 
-
+        System.out.println("USUARIO EXTRAÍDO DEL TOKEN: " + userEmail);
         // 5. Si hay un email y el usuario aún no está autenticado en el contexto actual
         // 5. MIO Este bloque valida el JWT, verifica al usuario en la base de datos y registra oficialmente al usuario autenticado dentro de Spring Security.
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {

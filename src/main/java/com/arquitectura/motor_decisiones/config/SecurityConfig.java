@@ -2,7 +2,6 @@ package com.arquitectura.motor_decisiones.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -30,6 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // La ruta del recepcionista (Login/Registro) es completamente pública
                         .requestMatchers("/api/v1/auth/**").permitAll()
+
                         // Cualquier otra habitación del sistema exige tener el gafete de autenticado
                         .anyRequest().authenticated()
                 )
@@ -42,7 +42,6 @@ public class SecurityConfig {
                 // Ponemos nuestro JwtAuthenticationFilter JUSTO ANTES del filtro estándar de Spring
                 // (UsernamePasswordAuthenticationFilter) para que intercepte y valide el token primero.
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 }
