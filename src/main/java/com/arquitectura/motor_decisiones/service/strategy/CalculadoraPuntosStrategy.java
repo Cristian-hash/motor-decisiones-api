@@ -1,4 +1,4 @@
-package com.arquitectura.motor_decisiones.service.strategy;
+/*package com.arquitectura.motor_decisiones.service.strategy;
 
 import com.arquitectura.motor_decisiones.entity.Progreso;
 
@@ -13,3 +13,4 @@ public interface CalculadoraPuntosStrategy {
     int calcularPuntos(Progreso progreso);
 
 }
+*/

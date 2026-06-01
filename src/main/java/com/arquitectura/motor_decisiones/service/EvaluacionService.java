@@ -11,8 +11,10 @@ import com.arquitectura.motor_decisiones.exception.RecursoNoEncontradoException;
 import com.arquitectura.motor_decisiones.repository.LeccionRepository;
 import com.arquitectura.motor_decisiones.repository.ProgresoRepository;
 import com.arquitectura.motor_decisiones.repository.UsuarioRepository;
+import com.arquitectura.motor_decisiones.service.strategy.CalculadoraPuntosStrategy;
 import com.arquitectura.motor_decisiones.service.strategy.EstrategiaEvaluacion;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class EvaluacionService {
     //1 Agenda de especialistas
     private final EvaluacionStrategyFactory factory;
+    public final CalculadoraPuntosStrategy estrategiaPuntos;
     private final UsuarioRepository usuarioRepository;
     private final LeccionRepository leccionRepository;
     private final ProgresoRepository progresoRepository;
@@ -32,11 +35,14 @@ public class EvaluacionService {
     @Autowired
     public EvaluacionService(
             EvaluacionStrategyFactory factory,
+            // Inyectamos por defecto la estrategia normal usando @Qualifier si se tiene varias
+            @Qualifier("puntosNormalStrategy") CalculadoraPuntosStrategy estrategiaPuntos,
             UsuarioRepository usuarioRepository,
             LeccionRepository leccionRepository,
             ProgresoRepository progresoRepository
     ) {
         this.factory = factory;
+        this.estrategiaPuntos= estrategiaPuntos;
         this.usuarioRepository = usuarioRepository;
         this.leccionRepository = leccionRepository;
         this.progresoRepository = progresoRepository;
@@ -72,8 +78,18 @@ public class EvaluacionService {
         nuevoProgreso.setLeccion(leccion);
         nuevoProgreso.setFechaIntento(LocalDateTime.now());
         nuevoProgreso.setCompletado(feedback.esCorrecto());
-        nuevoProgreso.setPuntajeObtenido(feedback.esCorrecto() ? leccion.getPuntosRecompensa() : 0);
+        //nuevoProgreso.setPuntajeObtenido(feedback.esCorrecto() ? leccion.getPuntosRecompensa() : 0);
         nuevoProgreso.setNivelAlcanzado("Principiante");
+        progresoRepository.save(nuevoProgreso);
+
+        if(feedback.esCorrecto()){
+            int puntosGanados =  estrategiaPuntos.calcularPuntos(nuevoProgreso);
+            nuevoProgreso.setPuntajeObtenido(puntosGanados);
+            usuario.setPuntosExperiencia(usuario.getPuntosExperiencia()+puntosGanados);
+            usuarioRepository.save(usuario);
+        }else{
+            nuevoProgreso.setPuntajeObtenido(0);
+        }
         progresoRepository.save(nuevoProgreso);
         return feedback;
     }

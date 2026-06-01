@@ -1,4 +1,4 @@
-package com.arquitectura.motor_decisiones.service.strategy;
+/*package com.arquitectura.motor_decisiones.service.strategy;
 
 import com.arquitectura.motor_decisiones.entity.Progreso;
 import org.springframework.stereotype.Component;
@@ -11,3 +11,4 @@ public class PuntosRachaStrategy implements CalculadoraPuntosStrategy {
         return 20;
     }
 }
+*/

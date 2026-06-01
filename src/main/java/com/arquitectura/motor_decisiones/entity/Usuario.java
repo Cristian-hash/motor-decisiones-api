@@ -25,6 +25,9 @@ public class Usuario {
     @Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
+    @Column(name ="puntos_experiencia")
+    private int puntosExperiencia=0;
+
     //  1 Usuario tiene Muchos Progresos
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Progreso> progresos = new ArrayList<>();
@@ -72,4 +75,9 @@ public class Usuario {
     public void setProgresos(List<Progreso> progresos) {
         this.progresos = progresos;
     }
+
+    public int getPuntosExperiencia() { return puntosExperiencia;}
+
+    public void setPuntosExperiencia(int puntosExperiencia) {this.puntosExperiencia = puntosExperiencia;}
+
 }
