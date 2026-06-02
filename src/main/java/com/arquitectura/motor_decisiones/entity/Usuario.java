@@ -79,5 +79,4 @@ public class Usuario {
     public int getPuntosExperiencia() { return puntosExperiencia;}
 
     public void setPuntosExperiencia(int puntosExperiencia) {this.puntosExperiencia = puntosExperiencia;}
-
 }

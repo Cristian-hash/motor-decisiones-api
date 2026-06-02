@@ -1,7 +1,6 @@
 package com.arquitectura.motor_decisiones.service.gamificacion;
 
 import com.arquitectura.motor_decisiones.entity.Progreso;
-import com.arquitectura.motor_decisiones.service.strategy.CalculadoraPuntosStrategy;
 import org.springframework.stereotype.Component;
 
 @Component("puntosNormalStrategy")

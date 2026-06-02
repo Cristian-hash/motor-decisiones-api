@@ -5,13 +5,12 @@ import com.arquitectura.motor_decisiones.dto.RespuestaEstudianteDTO;
 import com.arquitectura.motor_decisiones.entity.Leccion;
 import com.arquitectura.motor_decisiones.entity.Progreso;
 import com.arquitectura.motor_decisiones.entity.Usuario;
-import com.arquitectura.motor_decisiones.enums.TipoEvaluacion;
 import com.arquitectura.motor_decisiones.exception.LeccionYaCompletadaException;
 import com.arquitectura.motor_decisiones.exception.RecursoNoEncontradoException;
 import com.arquitectura.motor_decisiones.repository.LeccionRepository;
 import com.arquitectura.motor_decisiones.repository.ProgresoRepository;
 import com.arquitectura.motor_decisiones.repository.UsuarioRepository;
-import com.arquitectura.motor_decisiones.service.strategy.CalculadoraPuntosStrategy;
+import com.arquitectura.motor_decisiones.service.gamificacion.CalculadoraPuntosStrategy;
 import com.arquitectura.motor_decisiones.service.strategy.EstrategiaEvaluacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,9 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class EvaluacionService {
@@ -80,7 +76,6 @@ public class EvaluacionService {
         nuevoProgreso.setCompletado(feedback.esCorrecto());
         //nuevoProgreso.setPuntajeObtenido(feedback.esCorrecto() ? leccion.getPuntosRecompensa() : 0);
         nuevoProgreso.setNivelAlcanzado("Principiante");
-        progresoRepository.save(nuevoProgreso);
 
         if(feedback.esCorrecto()){
             int puntosGanados =  estrategiaPuntos.calcularPuntos(nuevoProgreso);
