@@ -25,7 +25,7 @@ public class Usuario {
     @Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
-    @Column(name ="puntos_experiencia")
+    @Column(name ="puntos_experiencia",nullable = false)
     private int puntosExperiencia=0;
 
     //  1 Usuario tiene Muchos Progresos
