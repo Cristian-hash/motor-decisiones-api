@@ -10,4 +10,5 @@ public class MotorDecisionesApplication {
         SpringApplication.run(MotorDecisionesApplication.class, args);
     }
 
+    /* Se hizo un test */
 }
