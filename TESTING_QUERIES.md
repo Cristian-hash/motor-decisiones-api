@@ -90,3 +90,77 @@ SELECT l.id AS leccion_id, l.titulo, o.id AS opcion_correcta_id, o.texto_opcion
 FROM lecciones l
 JOIN opciones_respuesta o ON l.id = o.leccion_id
 WHERE o.es_correcta = true;
+------------------------------------------------------------------------------
+PSEUDOCODIGO 
+
+1. El Diagnóstico (Análisis de tu código)
+   Lo que escribiste fue:
+
+Java
+public interface EvaluacionStrategyFactory{
+public UserRepository<>  x(String tipodeEvaluacion){
+}
+
+public class OpcionUnica implements EvaluacionStrategyFactory{
+}
+Tu idea (La metáfora del avión): "Si yo le digo 'aire' que sería el parámetro de entrada, él me da las llaves del avión que sería el objeto que él me retorna".
+¡Tu idea está perfecta! Entendiste el concepto de la "Fábrica" (Factory) a la perfección. El problema que tuviste fue simplemente organizar qué nombre le pertenece a qué pieza.
+
+En tu código, mezclaste el nombre del Molde de las herramientas (EstrategiaEvaluacion) con el nombre de la Fábrica (EvaluacionStrategyFactory).
+
+2. La Corrección Arquitectónica (Las 3 Piezas)
+   Vamos a poner los nombres correctos usando tu misma metáfora del avión.
+
+PIEZA 1: El Molde de la Herramienta (La Interfaz Strategy)
+Primero, necesitamos definir qué es un "vehículo". Todas las herramientas de evaluación deben firmar este contrato.
+
+Java
+// Este es el MOLDE. Todo el que evalúe debe tener este método.
+public interface EstrategiaEvaluacion {
+FeedbackDTO evaluar(RespuestaEstudianteDTO dto, Leccion leccion);
+}
+PIEZA 2: Las Herramientas Concretas (Las Clases Strategy)
+Ahora construimos los vehículos reales (avión, barco). Estas son tus clases de evaluación específicas. Ellas implementan la interfaz anterior.
+
+Java
+// Herramienta A: El "Barco"
+public class OpcionUnicaStrategy implements EstrategiaEvaluacion {
+@Override
+public FeedbackDTO evaluar(RespuestaEstudianteDTO dto, Leccion leccion) {
+// Lógica para corregir opción única
+return new FeedbackDTO(...);
+}
+}
+
+// Herramienta B: El "Avión"
+public class AnalisisCodigoStrategy implements EstrategiaEvaluacion {
+@Override
+public FeedbackDTO evaluar(RespuestaEstudianteDTO dto, Leccion leccion) {
+// Lógica para corregir código
+return new FeedbackDTO(...);
+}
+}
+PIEZA 3: La Fábrica (El Factory)
+Aquí es donde entra tu genial metáfora de las llaves. La Fábrica NO implementa las estrategias; ella conoce todas las estrategias y te devuelve la correcta.
+
+Java
+// Esta es la FÁBRICA. Tú le das una palabra, ella te da la herramienta.
+public class EvaluacionStrategyFactory {
+
+    // El "Mostrador" donde la fábrica tiene guardados todos los vehículos
+    private Map<String, EstrategiaEvaluacion> estrategias;
+
+    // Tu método de la metáfora: le das "aire" (String), te devuelve el Avión (EstrategiaEvaluacion)
+    public EstrategiaEvaluacion obtenerEstrategia(String tipoEvaluacion) {
+        return estrategias.get(tipoEvaluacion);
+    }
+}
+
+3. La Lección de Arquitectura (La "Aja!" Moment)
+   ¿Ves la diferencia clave?
+
+No implementaste EvaluacionStrategyFactory en OpcionUnica. Las opciones únicas implementan EstrategiaEvaluacion (el molde).
+
+La Fábrica (Factory) es una clase separada. Su único trabajo en el mundo es tener un mapa (Map) y ejecutar tu metáfora: "Toma esta palabra, dame el objeto que sirve para eso".
+
+}
