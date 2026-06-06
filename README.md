@@ -27,7 +27,7 @@ El sistema está construido sobre un stack moderno y robusto:
 * **Framework:** Spring Boot 3.x
 * **Base de Datos:** PostgreSQL 16
 * **Persistencia:** Spring Data JPA / Hibernate
-* **Arquitectura:** En capas (Controller, Service, Repository) orientada a dominio
+* **Arquitectura:** En capas (Controller, Service, Repository) orientada a dominio y patrones de diseño (Factory, Strategy).
 
 ---
 
@@ -58,6 +58,11 @@ El diseño separa claramente responsabilidades para permitir escalabilidad y evo
 * Representar conocimiento estructurado
 * Permitir expansión dinámica del contenido
 
+### 🔹 Reglas de Integridad
+
+* Relaciones bidireccionales (`@OneToMany`).
+* Eliminación en cascada (cascade) para mantener integridad referencial y evitar datos huérfanos.
+
 ---
 
 ### 🔹 Relaciones
@@ -82,8 +87,9 @@ El proyecto se encuentra en desarrollo activo:
 * [x] **Fase 3:** Repositorios + Endpoint base
 - [x] **Fase 4:** Lógica de Negocio (Motor de evaluación), DTOs y Manejo Global de Excepciones
 - [x] **Fase 5:** API de Lecciones Inteligentes (Siguiente paso)
-- [ ] **Fase 6:** Seguridad (Spring Security + JWT)
-- [ ] **Fase 7:** CI/CD + Despliegue en la nube (Azure)
+- [x] **Fase 6:** Seguridad (Spring Security + Autenticación Stateless con JWT).
+* [ ] **Fase 7:** Integración de Arquitectura Orientada a Eventos (Observer / Apache Kafka).
+* [ ] **Fase 8:** CI/CD + Despliegue en la nube (Azure).
 ---
 
 ## 🚦 Cómo levantar el proyecto en local
@@ -120,7 +126,8 @@ spring.datasource.username=tu_usuario
 spring.datasource.password=tu_password
 spring.jpa.hibernate.ddl-auto=update
 ```
-
+# Llave secreta para firmar los Tokens (Debe tener al menos 256 bits)
+jwt.secret=tu_clave_secreta_super_larga_generada_para_seguridad_jwt
 ---
 
 ### 4️⃣ Ejecutar el servidor
@@ -178,8 +185,36 @@ Respuesta (200 OK):
 JSON
 {
 "esCorrecto": true,
-"mensajeJustificacion": "¡Exacto! Delegas la lógica a clases independientes respetando Open/Closed."
+"mensajeJustificacion": "¡Exacto! Delegas la lógica a clases independientes respetando Open/Closed.","puntosGanados": 15
 }
+
+🧪 Pruebas E2E y Manipulación de Estado (QA)
+Para facilitar las pruebas de integración continua sin tener que crear usuarios nuevos constantemente, utiliza los siguientes scripts en tu cliente SQL (ej. DBeaver) para resetear el estado de la aplicación y evadir la regla antifraude.
+
+A. Resetear el Estado del Jugador
+Elimina el historial de una lección para permitir reintentos infinitos durante las pruebas.
+
+-- Borra el historial de un usuario específico
+DELETE FROM progresos WHERE usuario_id = 1;
+
+-- Resetea su experiencia a cero
+UPDATE usuarios SET puntos_experiencia = 0 WHERE id = 1;
+
+B. Inyectar Nueva Lección (Data Seeding)
+Útil para probar el Motor de Decisiones con nuevos retos arquitectónicos.
+
+SQL
+-- 1. Crear Lección
+INSERT INTO lecciones (titulo, problema_hook, metafora, pseudocodigo, codigo_java, puntos_recompensa, tipo_evaluacion, patron_id)
+VALUES ('El poder del Observer', 'Problema: Acoplamiento extremo.', 'Metáfora: Suscripción a YouTube.', 'Pseudocódigo...', 'public interface...', 15, 'OPCION_UNICA', 1);
+
+-- 2. Identificar el ID generado (Evitar problemas por Gaps de secuencia)
+SELECT id, titulo FROM lecciones ORDER BY id DESC LIMIT 1;
+
+-- 3. Crear Opciones (Reemplazar X por el ID obtenido)
+INSERT INTO opciones_respuesta (texto_opcion, es_correcta, justificacion_feedback, leccion_id)
+VALUES ('Respuesta correcta', true, '¡Exacto!', X);
+
 🛡️ Manejo Global de Excepciones (Ejemplo 404)
 El sistema está protegido con @RestControllerAdvice. Las rutas inválidas devuelven paracaídas estructurales en lugar de errores 500.
 
@@ -194,18 +229,17 @@ JSON
 "fecha": "2026-05-10T10:15:30.123"
 }
 🧭 Enfoque Arquitectónico
-Este sistema está construido bajo principios SOLID y Arquitectura Limpia, siguiendo reglas inquebrantables:
+Este sistema está construido bajo principios SOLID, Arquitectura Limpia y Patrones de Diseño (GoF), siguiendo reglas inquebrantables:
 
-Responsabilidad Única por Capa: * Los Controllers son "recepcionistas": solo traducen JSON a Java y delegan (máximo 3 líneas de código).
+Responsabilidad Única por Capa: Los Controllers son "recepcionistas": solo traducen JSON a Java y delegan (máximo 3 líneas de código). Los Services son el "juez" y orquestador. Los Repositories son la "memoria".
 
-Los Services son el "juez": aquí vive la lógica de evaluación, reglas de negocio y transacciones (@Transactional).
+Encapsulación de la Creación (Factory Pattern): El servicio principal no instancia algoritmos de corrección mediante condicionales gigantes (if/switch). Delega esta responsabilidad a un EvaluacionStrategyFactory.
 
-Los Repositories son la "memoria": interfaces que dialogan con PostgreSQL.
+Comportamiento Dinámico (Strategy Pattern): Las reglas para calificar un examen o para otorgar puntos de gamificación (ej. rachas, bonificaciones) son inyectadas en tiempo de ejecución, respetando el principio Open/Closed.
 
-Seguridad Fronteriza (DTOs): Las entidades de la base de datos NUNCA viajan a internet. Se utilizan Records de Java para filtrar campos sensibles (como esCorrecta) entregando solo Vistas Materializadas.
+Seguridad Fronteriza (DTOs y JWT): Las entidades de la base de datos NUNCA viajan a internet. Se utilizan Records de Java para filtrar campos sensibles entregando solo "Vistas Materializadas". Todo el sistema está blindado por diseño Stateless con JSON Web Tokens.
 
-Manejo de Caos (Programación Defensiva): El sistema no confía ciegamente en el cliente. Intercepta fallos de integridad y recursos ausentes devolviendo respuestas JSON amigables para el Frontend.
-
+Manejo de Caos (Programación Defensiva): El sistema no confía ciegamente en el cliente. Intercepta fallos de integridad y recursos ausentes de forma global (@RestControllerAdvice), devolviendo respuestas estandarizadas (RFC 7807) en lugar de exponer trazas de error (500).
 ✍️ Autor
 Crhistian Pacori
 Ingeniero de Sistemas enfocado en Backend y Cloud Architecture.
