@@ -5,6 +5,7 @@ import com.arquitectura.motor_decisiones.dto.RespuestaEstudianteDTO;
 import com.arquitectura.motor_decisiones.entity.Leccion;
 import com.arquitectura.motor_decisiones.entity.Progreso;
 import com.arquitectura.motor_decisiones.entity.Usuario;
+import com.arquitectura.motor_decisiones.events.LeccionCompletadaEvent;
 import com.arquitectura.motor_decisiones.exception.LeccionYaCompletadaException;
 import com.arquitectura.motor_decisiones.exception.RecursoNoEncontradoException;
 import com.arquitectura.motor_decisiones.repository.LeccionRepository;
@@ -14,10 +15,11 @@ import com.arquitectura.motor_decisiones.service.gamificacion.CalculadoraPuntosS
 import com.arquitectura.motor_decisiones.service.strategy.EstrategiaEvaluacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
+
 
 @Service
 public class EvaluacionService {
@@ -27,6 +29,7 @@ public class EvaluacionService {
     private final UsuarioRepository usuarioRepository;
     private final LeccionRepository leccionRepository;
     private final ProgresoRepository progresoRepository;
+    private final ApplicationEventPublisher publisher;
 
     @Autowired
     public EvaluacionService(
@@ -35,17 +38,19 @@ public class EvaluacionService {
             @Qualifier("puntosNormalStrategy") CalculadoraPuntosStrategy estrategiaPuntos,
             UsuarioRepository usuarioRepository,
             LeccionRepository leccionRepository,
-            ProgresoRepository progresoRepository
+            ProgresoRepository progresoRepository,
+            ApplicationEventPublisher publisher
     ) {
         this.factory = factory;
         this.estrategiaPuntos= estrategiaPuntos;
         this.usuarioRepository = usuarioRepository;
         this.leccionRepository = leccionRepository;
         this.progresoRepository = progresoRepository;
+        this.publisher = publisher;
     }
     @Transactional // Garantiza que si falla el guardado, no haya datos inconsistentes
     public FeedbackDTO evaluarDecision(RespuestaEstudianteDTO dto) {
-        //REGLA ANTIFRAUDE
+        // 1. REGLA ANTIFRAUDE
         boolean yaAprobo = progresoRepository.existsByUsuarioIdAndLeccionIdAndCompletadoTrue(
                 dto.usuarioId(), dto.leccionId());
 
@@ -55,7 +60,7 @@ public class EvaluacionService {
             );
         }
 
-        // 2. Extraer dato
+        // 2. EXTRAER DATOS
         Usuario usuario = usuarioRepository.findById(dto.usuarioId()).
                 orElseThrow(() -> new RecursoNoEncontradoException("Error: opcion con id " + dto.usuarioId() + " no encontrada"));
 
@@ -65,26 +70,38 @@ public class EvaluacionService {
         // 3. ORQUESTAR: El Service pide la herramienta a la Fábrica
             EstrategiaEvaluacion estrategia = factory.obtenerEstrategia(leccion.getTipoEvaluacion());
 
-        // 4. DELEGAR: El Service ejecuta la herramienta
+        // 4. DELEGAR: El Service ejecuta la herramienta de evaluación
         FeedbackDTO feedback = estrategia.evaluar(dto, leccion);
 
-        // 5. GUARDAR PROGRESO (Intacto)
+        // 5. PREPARAR EL PROGRESO
         Progreso nuevoProgreso = new Progreso();
         nuevoProgreso.setUsuario(usuario);
         nuevoProgreso.setLeccion(leccion);
         nuevoProgreso.setFechaIntento(LocalDateTime.now());
         nuevoProgreso.setCompletado(feedback.esCorrecto());
-        //nuevoProgreso.setPuntajeObtenido(feedback.esCorrecto() ? leccion.getPuntosRecompensa() : 0);
         nuevoProgreso.setNivelAlcanzado("Principiante");
 
+        // 6. PROCESAR RESULTADO Y EMITIR EVENTO
         if(feedback.esCorrecto()){
+            // Calculamos puntos con nuestra estrategia de gamificación
             int puntosGanados =  estrategiaPuntos.calcularPuntos(nuevoProgreso);
             nuevoProgreso.setPuntajeObtenido(puntosGanados);
+            // Actualizamos la entidad Usuario
             usuario.setPuntosExperiencia(usuario.getPuntosExperiencia()+puntosGanados);
             usuarioRepository.save(usuario);
+
+            // 🔥 ¡EL GRITO DEL EVENTO!
+            // Como la lección fue un éxito, creamos el hecho inmutable y lo lanzamos al aire
+            LeccionCompletadaEvent event = new LeccionCompletadaEvent(
+                    usuario.getId(),
+                    leccion.getId(),
+                    puntosGanados
+            );
+            publisher.publishEvent(event);
         }else{
             nuevoProgreso.setPuntajeObtenido(0);
         }
+        // 7. PERSISTIR PROGRESO Y RETORNAR
         progresoRepository.save(nuevoProgreso);
         return feedback;
     }
