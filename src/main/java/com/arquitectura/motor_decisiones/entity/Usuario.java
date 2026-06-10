@@ -28,6 +28,9 @@ public class Usuario {
     @Column(name ="puntos_experiencia",nullable = false)
     private int puntosExperiencia=0;
 
+    @Column(name = "insignia")
+    private String insignia;
+
     //  1 Usuario tiene Muchos Progresos
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Progreso> progresos = new ArrayList<>();
@@ -79,4 +82,9 @@ public class Usuario {
     public int getPuntosExperiencia() { return puntosExperiencia;}
 
     public void setPuntosExperiencia(int puntosExperiencia) {this.puntosExperiencia = puntosExperiencia;}
+
+    public String getInsignia() {return insignia;}
+
+    public void setInsignia(String insignia) {this.insignia = insignia;}
+
 }
