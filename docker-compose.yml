@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # Zookeeper es el "gerente" que mantiene a Kafka organizado y funcionando
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.4
+    container_name: zookeeper-tesis
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  # Kafka es el "tubo gigante" o la oficina de correos
+  kafka:
+    image: confluentinc/cp-kafka:7.4.4
+    container_name: kafka-tesis
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # Aquí le decimos a Kafka por qué puerto se comunicará con tu Spring Boot
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
