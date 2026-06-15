@@ -5,8 +5,10 @@ import com.arquitectura.motor_decisiones.dto.OpcionRespuestaDTO;
 import com.arquitectura.motor_decisiones.entity.Leccion;
 import com.arquitectura.motor_decisiones.exception.RecursoAusenteException;
 import com.arquitectura.motor_decisiones.repository.LeccionRepository;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,9 +16,14 @@ import java.util.stream.Collectors;
 @Service
 public class LeccionService {
     private final LeccionRepository leccionRepository;
+    private final KafkaTemplate<String,String> kafkaTemplate;
 
-    public LeccionService(LeccionRepository leccionRepository) {
+    public LeccionService(
+            LeccionRepository leccionRepository,
+            KafkaTemplate kafkaTemplate
+    ) {
         this.leccionRepository = leccionRepository;
+        this.kafkaTemplate=kafkaTemplate;
     }
 
     @Transactional(readOnly = true)
@@ -46,3 +53,4 @@ public class LeccionService {
         );
     }
 }
+//ESTE DIA ORGANIZE MI CODIGO EN FUNCION DE LO DE APRENDIZAJE NEFOCADO EN COMPRENDER
