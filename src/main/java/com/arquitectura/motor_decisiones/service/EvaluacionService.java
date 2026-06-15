@@ -16,8 +16,11 @@ import com.arquitectura.motor_decisiones.service.strategy.EstrategiaEvaluacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
+
 import java.time.LocalDateTime;
 
 @Service
@@ -29,6 +32,8 @@ public class EvaluacionService {
     private final LeccionRepository leccionRepository;
     private final ProgresoRepository progresoRepository;
     private final ApplicationEventPublisher publisher;
+    private final KafkaTemplate<String,String> kafkaTemplate;
+    private final ObjectMapper objectMapper; // Convertidor a JSON
 
     @Autowired
     public EvaluacionService(
@@ -38,7 +43,9 @@ public class EvaluacionService {
             UsuarioRepository usuarioRepository,
             LeccionRepository leccionRepository,
             ProgresoRepository progresoRepository,
-            ApplicationEventPublisher publisher
+            ApplicationEventPublisher publisher,
+            KafkaTemplate kafkaTemplate,
+            ObjectMapper objectMapper
     ) {
         this.factory = factory;
         this.estrategiaPuntos= estrategiaPuntos;
@@ -46,6 +53,8 @@ public class EvaluacionService {
         this.leccionRepository = leccionRepository;
         this.progresoRepository = progresoRepository;
         this.publisher = publisher;
+        this.kafkaTemplate=kafkaTemplate;
+        this.objectMapper = objectMapper;
     }
     @Transactional // Garantiza que si falla el guardado, no haya datos inconsistentes
     public FeedbackDTO evaluarDecision(RespuestaEstudianteDTO dto) {
@@ -96,8 +105,19 @@ public class EvaluacionService {
                     leccion.getId(),
                     puntosGanados
             );
+            try{
+                // 1. Convertimos el Récord a un String en formato JSON
+                String mensajeJson = objectMapper.writeValueAsString(event);
+                // 2. Enviamos el JSON al tópico "gamificacion-topic"
+                kafkaTemplate.send("gamificacion-topic", mensajeJson);
+
+                System.out.println("🚀 [KAFKA PRODUCER] Evento enviado a la nube: " + mensajeJson);
+
+            }catch(Exception e){
+            System.err.println("❌ Error al convertir el evento a JSON: " + e.getMessage());
             publisher.publishEvent(event);
-        }else{
+            }
+        } else {
             nuevoProgreso.setPuntajeObtenido(0);
         }
         // 7. PERSISTIR PROGRESO Y RETORNAR

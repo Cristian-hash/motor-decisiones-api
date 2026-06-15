@@ -16,14 +16,11 @@ import java.util.stream.Collectors;
 @Service
 public class LeccionService {
     private final LeccionRepository leccionRepository;
-    private final KafkaTemplate<String,String> kafkaTemplate;
 
     public LeccionService(
-            LeccionRepository leccionRepository,
-            KafkaTemplate kafkaTemplate
+            LeccionRepository leccionRepository
     ) {
         this.leccionRepository = leccionRepository;
-        this.kafkaTemplate=kafkaTemplate;
     }
 
     @Transactional(readOnly = true)
@@ -36,6 +33,7 @@ public class LeccionService {
         if (leccion.getOpciones().isEmpty()) {
             throw new IllegalStateException("Error de integridad: La lección existe, pero carece de opciones configuradas.");
         }
+
         // Transformar entidades en DTOs para exponer solo
         // la información necesaria hacia el cliente
         List<OpcionRespuestaDTO> opcionesDTO = leccion.getOpciones().stream()
@@ -50,7 +48,7 @@ public class LeccionService {
                 leccion.getPseudocodigo(),
                 leccion.getCodigoJava(),
                 opcionesDTO
-        );
-    }
+            );
+        }
 }
 //ESTE DIA ORGANIZE MI CODIGO EN FUNCION DE LO DE APRENDIZAJE NEFOCADO EN COMPRENDER
