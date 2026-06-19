@@ -253,3 +253,39 @@ Fíjate cómo cambié tu frase final por tu verdadera ancla de las últimas sema
 ## 🔥 Frase del Proyecto
 
 > *Programar para entender. Diseñar para decidir.*
+> 
+> -----------
+> ## 🏗️ Arquitectura del Sistema (Orientada a Eventos)
+
+Este proyecto ha evolucionado de un monolito fuertemente acoplado a una **Arquitectura Orientada a Eventos (Event-Driven Architecture)** con tolerancia a fallos.
+
+El sistema se divide lógicamente en dos dominios que se comunican de forma asíncrona:
+1. **Motor de Evaluación:** Dicta la lógica de negocio, califica al estudiante y emite un evento (`LeccionCompletadaEvent`).
+2. **Sistema de Gamificación:** Escucha los eventos de manera independiente y otorga puntos o insignias.
+
+### Decisiones de Diseño (ADR)
+* **Tolerancia a Fallos (Apache Kafka):** Se introdujo un broker de mensajería (Kafka) entre los dominios. Si el servicio de recompensas colapsa, el motor de evaluación sigue funcionando perfectamente y Kafka retiene los eventos hasta que el servicio consumidor se recupere. Cero pérdida de datos.
+* **Puertos y Adaptadores (Clean Architecture):** El `EvaluacionService` **no conoce** a Kafka. Delega la publicación a una interfaz genérica (`EventPublisher`). El adaptador `KafkaEventPublisher` realiza la serialización a JSON (interoperabilidad) y la comunicación con Docker. Esto permite cambiar Kafka por AWS SQS o RabbitMQ en el futuro sin alterar una sola línea del core de negocio.
+
+---
+
+## 🚀 Requisitos e Infraestructura (Docker)
+
+Debido a la arquitectura distribuida, el proyecto ahora requiere infraestructura en contenedores para manejar la mensajería.
+
+**Pre-requisitos:**
+* Java 21+
+* PostgreSQL (Puerto 5432)
+* **Docker Desktop** (Obligatorio para el Broker de Mensajería)
+
+**Pasos para levantar la infraestructura local:**
+
+1. Abre una terminal en la raíz del proyecto (donde se encuentra el archivo `docker-compose.yml`).
+2. Levanta los contenedores de Zookeeper (Gestor) y Kafka (Broker) en segundo plano:
+   ```bash
+   docker compose up -d
+   
+##Verifica que ambos contenedores estén ejecutándose (Up):
+docker ps
+## Una vez que Kafka esté corriendo en el puerto 9092, puedes iniciar la aplicación Spring Boot desde tu IDE o consola.
+Una vez que Kafka esté corriendo en el puerto 9092, puedes iniciar la aplicación Spring Boot desde tu IDE o consola.
