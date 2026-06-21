@@ -5,6 +5,7 @@ import com.arquitectura.motor_decisiones.dto.RespuestaEstudianteDTO;
 import com.arquitectura.motor_decisiones.entity.Leccion;
 import com.arquitectura.motor_decisiones.entity.Progreso;
 import com.arquitectura.motor_decisiones.entity.Usuario;
+import com.arquitectura.motor_decisiones.events.EventPublisher;
 import com.arquitectura.motor_decisiones.events.LeccionCompletadaEvent;
 import com.arquitectura.motor_decisiones.exception.LeccionYaCompletadaException;
 import com.arquitectura.motor_decisiones.exception.RecursoNoEncontradoException;
@@ -15,11 +16,8 @@ import com.arquitectura.motor_decisiones.service.gamificacion.CalculadoraPuntosS
 import com.arquitectura.motor_decisiones.service.strategy.EstrategiaEvaluacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 
@@ -31,9 +29,9 @@ public class EvaluacionService {
     private final UsuarioRepository usuarioRepository;
     private final LeccionRepository leccionRepository;
     private final ProgresoRepository progresoRepository;
-    private final ApplicationEventPublisher publisher;
-    private final KafkaTemplate<String,String> kafkaTemplate;
-    private final ObjectMapper objectMapper; // Convertidor a JSON
+
+    // El Enchufe (La Interfaz). El servicio no sabe nada de Kafka.
+    private final EventPublisher eventPublisher;
 
     @Autowired
     public EvaluacionService(
@@ -43,18 +41,14 @@ public class EvaluacionService {
             UsuarioRepository usuarioRepository,
             LeccionRepository leccionRepository,
             ProgresoRepository progresoRepository,
-            ApplicationEventPublisher publisher,
-            KafkaTemplate kafkaTemplate,
-            ObjectMapper objectMapper
+            EventPublisher eventPublisher
     ) {
         this.factory = factory;
         this.estrategiaPuntos= estrategiaPuntos;
         this.usuarioRepository = usuarioRepository;
         this.leccionRepository = leccionRepository;
         this.progresoRepository = progresoRepository;
-        this.publisher = publisher;
-        this.kafkaTemplate=kafkaTemplate;
-        this.objectMapper = objectMapper;
+        this.eventPublisher = eventPublisher;
     }
     @Transactional // Garantiza que si falla el guardado, no haya datos inconsistentes
     public FeedbackDTO evaluarDecision(RespuestaEstudianteDTO dto) {
@@ -98,25 +92,15 @@ public class EvaluacionService {
             usuario.setPuntosExperiencia(usuario.getPuntosExperiencia()+puntosGanados);
             usuarioRepository.save(usuario);
 
-            // 🔥 ¡EL GRITO DEL EVENTO!
+            // ¡EL GRITO DEL EVENTO!
             // Como la lección fue un éxito, creamos el hecho inmutable y lo lanzamos al aire
             LeccionCompletadaEvent event = new LeccionCompletadaEvent(
                     usuario.getId(),
                     leccion.getId(),
                     puntosGanados
             );
-            try{
-                // 1. Convertimos el Récord a un String en formato JSON
-                String mensajeJson = objectMapper.writeValueAsString(event);
-                // 2. Enviamos el JSON al tópico "gamificacion-topic"
-                kafkaTemplate.send("gamificacion-topic", mensajeJson);
-
-                System.out.println("🚀 [KAFKA PRODUCER] Evento enviado a la nube: " + mensajeJson);
-
-            }catch(Exception e){
-            System.err.println("❌ Error al convertir el evento a JSON: " + e.getMessage());
-            publisher.publishEvent(event);
-            }
+            // DELEGAMOS A LA INTERFAZ (El Service NO sabe qué tecnología se usará)
+            eventPublisher.publicarLeccionCompletada(event);
         } else {
             nuevoProgreso.setPuntajeObtenido(0);
         }
