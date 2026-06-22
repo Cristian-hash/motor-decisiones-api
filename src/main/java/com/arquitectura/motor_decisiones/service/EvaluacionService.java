@@ -19,8 +19,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 @Service
 public class EvaluacionService {
     //1 Agenda de especialistas
@@ -52,7 +50,7 @@ public class EvaluacionService {
     }
     @Transactional // Garantiza que si falla el guardado, no haya datos inconsistentes
     public FeedbackDTO evaluarDecision(RespuestaEstudianteDTO dto) {
-        // 1. REGLA ANTIFRAUDE
+        // 1. REGLA ANTIFRAUDE (Tu lógica aquí está perfecta)
         boolean yaAprobo = progresoRepository.existsByUsuarioIdAndLeccionIdAndCompletadoTrue(
                 dto.usuarioId(), dto.leccionId());
 
@@ -75,37 +73,37 @@ public class EvaluacionService {
         // 4. DELEGAR: El Service ejecuta la herramienta de evaluación
         FeedbackDTO feedback = estrategia.evaluar(dto, leccion);
 
-        // 5. PREPARAR EL PROGRESO
-        Progreso nuevoProgreso = new Progreso();
-        nuevoProgreso.setUsuario(usuario);
-        nuevoProgreso.setLeccion(leccion);
-        nuevoProgreso.setFechaIntento(LocalDateTime.now());
-        nuevoProgreso.setCompletado(feedback.esCorrecto());
-        nuevoProgreso.setNivelAlcanzado("Principiante");
-
-        // 6. PROCESAR RESULTADO Y EMITIR EVENTO
-        if(feedback.esCorrecto()){
+        // 5. CALCULAR PUNTOS ANTES DE CREAR EL EVENTO
+        int puntosGanados = 0;
+        if(feedback.esCorrecto()) {
             // Calculamos puntos con nuestra estrategia de gamificación
-            int puntosGanados =  estrategiaPuntos.calcularPuntos(nuevoProgreso);
-            nuevoProgreso.setPuntajeObtenido(puntosGanados);
-            // Actualizamos la entidad Usuario
-            usuario.setPuntosExperiencia(usuario.getPuntosExperiencia()+puntosGanados);
-            usuarioRepository.save(usuario);
+            puntosGanados = estrategiaPuntos.calcularPuntos(usuario, leccion);
 
-            // ¡EL GRITO DEL EVENTO!
-            // Como la lección fue un éxito, creamos el hecho inmutable y lo lanzamos al aire
+            // Actualizamos la entidad Usuario (Esto actúa como una caché rápida del total)
+            usuario.setPuntosExperiencia(usuario.getPuntosExperiencia() + puntosGanados);
+            usuarioRepository.save(usuario);
+        }
+
+// 6. PREPARAR Y PERSISTIR EL PROGRESO INMUTABLE (El Evento)
+        // Usamos el nuevo constructor sin setters. ¡Nace y se queda así para siempre!
+        Progreso nuevoProgreso = new Progreso(
+                puntosGanados,
+                "Principiante",
+                usuario,
+                leccion,
+                feedback.esCorrecto()
+        );
+        progresoRepository.save(nuevoProgreso);
+
+        // 7. EMITIR EVENTO A KAFKA / OTROS SISTEMAS
+        if(feedback.esCorrecto()){
             LeccionCompletadaEvent event = new LeccionCompletadaEvent(
                     usuario.getId(),
                     leccion.getId(),
                     puntosGanados
             );
-            // DELEGAMOS A LA INTERFAZ (El Service NO sabe qué tecnología se usará)
             eventPublisher.publicarLeccionCompletada(event);
-        } else {
-            nuevoProgreso.setPuntajeObtenido(0);
         }
-        // 7. PERSISTIR PROGRESO Y RETORNAR
-        progresoRepository.save(nuevoProgreso);
         return feedback;
     }
 }

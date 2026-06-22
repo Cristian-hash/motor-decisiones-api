@@ -12,7 +12,7 @@ public class Progreso {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false,updatable = false)
     private Integer puntajeObtenido;
 
     @Column(nullable = false)
@@ -32,63 +32,40 @@ public class Progreso {
     @Column(nullable = false)
     private Boolean completado;
 
-    public Progreso() {
-        this.fechaIntento = LocalDateTime.now();
+    // 1. Constructor vacío protegido (JPA lo requiere, pero nosotros no lo usaremos directamente)
+    protected Progreso() {
     }
 
+    // 2. Constructor de Evento: Exige todos los datos al momento de crear el registro
+    public Progreso(Integer puntajeObtenido, String nivelAlcanzado, Usuario usuario, Leccion leccion, Boolean completado) {
+        this.puntajeObtenido = puntajeObtenido;
+        this.nivelAlcanzado = nivelAlcanzado;
+        this.usuario = usuario;
+        this.leccion = leccion;
+        this.completado = completado;
+        this.fechaIntento = LocalDateTime.now(); // La fecha se fija al nacer, inmutable.
+    }
+    // 3. ¡SOLO GETTERS! Eliminamos todos los setters.
+    // Nadie podrá modificar este objeto una vez instanciado.
     public Long getId() {
         return id;
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Integer getPuntajeObtenido() {
         return puntajeObtenido;
     }
-
-    public void setPuntajeObtenido(Integer puntajeObtenido) {
-        this.puntajeObtenido = puntajeObtenido;
-    }
-
     public String getNivelAlcanzado() {
         return nivelAlcanzado;
     }
-
-    public void setNivelAlcanzado(String nivelAlcanzado) {
-        this.nivelAlcanzado = nivelAlcanzado;
-    }
-
     public LocalDateTime getFechaIntento() {
         return fechaIntento;
     }
-
-    public void setFechaIntento(LocalDateTime fechaIntento) {
-        this.fechaIntento = fechaIntento;
-    }
-
     public Usuario getUsuario() {
         return usuario;
     }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
     public Leccion getLeccion() {
         return leccion;
     }
-
-    public void setLeccion(Leccion leccion) {
-        this.leccion = leccion;
-    }
-
     public Boolean getCompletado() {
         return completado;
-    }
-
-    public void setCompletado(Boolean completado) {
-        this.completado = completado;
     }
 }
