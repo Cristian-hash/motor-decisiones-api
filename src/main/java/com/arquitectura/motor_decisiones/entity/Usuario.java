@@ -31,6 +31,11 @@ public class Usuario {
     @Column(name = "insignia")
     private String insignia;
 
+    // EL ESCUDO ARQUITECTÓNICO
+    @Version
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long version = 0L;
+
     //  1 Usuario tiene Muchos Progresos
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Progreso> progresos = new ArrayList<>();
