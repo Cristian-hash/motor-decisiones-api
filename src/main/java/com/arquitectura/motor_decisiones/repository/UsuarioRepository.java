@@ -12,8 +12,4 @@ import java.util.Optional;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByEmail(String email);
 
-    // NUEVO MÉTODO ARQUITECTÓNICO: Bloqueo Pesimista
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT u FROM Usuario u WHERE u.id = :id")
-    Optional<Usuario> findByIdForUpdate(@Param("id") Long id);
 }

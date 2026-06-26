@@ -68,7 +68,7 @@ public class EvaluacionService {
         }
 
         // 2. EXTRAER DATOS
-        Usuario usuario = usuarioRepository.findByIdForUpdate(dto.usuarioId()).
+        Usuario usuario = usuarioRepository.findById(dto.usuarioId()).
                 orElseThrow(() -> new RecursoNoEncontradoException("Error: opcion con id " + dto.usuarioId() + " no encontrada"));
 
         Leccion leccion = leccionRepository.findById(dto.leccionId()).
