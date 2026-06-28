@@ -34,6 +34,7 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
+    //Dom 28 de marzo - comprension de como funcionan las excepciones con la cabecera @RestControllerService
     // 3. NUEVO ESCUDO: Atrapa el Bloqueo Optimista (@Version)
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
     public ResponseEntity<ErrorResponseDTO> manejarOptimisticLocking(ObjectOptimisticLockingFailureException ex) {
