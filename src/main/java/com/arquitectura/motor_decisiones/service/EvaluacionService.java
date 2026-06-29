@@ -53,14 +53,6 @@ public class EvaluacionService {
         // 1. REGLA ANTIFRAUDE (Tu lógica aquí está perfecta)
         boolean yaAprobo = progresoRepository.existsByUsuarioIdAndLeccionIdAndCompletadoTrue(
                 dto.usuarioId(), dto.leccionId());
-        // --- INICIO DE SIMULACIÓN DE LENTITUD ---
-        try {
-            System.out.println("Hilo " + Thread.currentThread().getName() + " validó que yaAprobo es: " + yaAprobo);
-            Thread.sleep(3000); // Pausamos por 3 segundos
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        // --- FIN DE SIMULACIÓN ---
         if (yaAprobo) {
             throw new LeccionYaCompletadaException(
                     "FRAUDE DETECTADO: El usuario " + dto.usuarioId() + "ya completo con éxito la lección" + dto.leccionId() + ". No se permiten puntos duplicados."
@@ -100,6 +92,7 @@ public class EvaluacionService {
                 leccion,
                 feedback.esCorrecto()
         );
+
         progresoRepository.save(nuevoProgreso);
 
         // 7. EMITIR EVENTO A KAFKA / OTROS SISTEMAS

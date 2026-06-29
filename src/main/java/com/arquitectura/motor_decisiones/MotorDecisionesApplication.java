@@ -9,6 +9,4 @@ public class MotorDecisionesApplication {
     public static void main(String[] args) {
         SpringApplication.run(MotorDecisionesApplication.class, args);
     }
-
-    /* Se hizo un test */
 }
