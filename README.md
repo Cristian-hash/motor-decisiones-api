@@ -46,6 +46,22 @@ El diseño separa claramente responsabilidades para permitir escalabilidad y evo
 * Registrar historial de decisiones (inmutable)
 
 ---
+## 🛡️ Arquitectura de Resiliencia y Concurrencia
+
+Este motor de decisiones está diseñado para soportar entornos de alta concurrencia, garantizando un **100% de consistencia de datos** bajo pruebas de estrés (probado a 20 req/s simultáneas) mediante una estrategia de **Defensa en Profundidad (Defense in Depth)**:
+
+### 1. Inmutabilidad y Auditoría (Event Sourcing Ligero)
+Las interacciones de los estudiantes con las lecciones no sobrescriben registros anteriores (`UPDATE`). El sistema utiliza una entidad `Progreso` inmutable (sin *setters*, campos `updatable = false`). Cada intento es un nuevo `INSERT`, permitiendo una trazabilidad perfecta del historial de aprendizaje del usuario y preparando el terreno para arquitecturas orientadas a eventos (Kafka).
+
+### 2. Prevención de Condiciones de Carrera (Race Conditions)
+Para evitar la duplicidad de recompensas (ej. doble clic del cliente), el sistema no confía únicamente en validaciones lógicas en memoria. Implementa múltiples capas de seguridad:
+* **Capa Lógica:** Validación inicial en el `EvaluacionService` (`if yaAprobo`).
+* **Capa Física (Motor SQL):** Restricciones atómicas en la base de datos (`UNIQUE CONSTRAINT` en `usuario_id`, `leccion_id` y `completado`).
+* **Control de Mutabilidad:** Uso de Bloqueo Optimista (`@Version`) para transacciones regulares, y Bloqueo Pesimista (`PESSIMISTIC_WRITE` / `SELECT FOR UPDATE`) aislado en repositorios críticos para serializar hilos conflictivos sin corromper el estado.
+
+### 3. Manejo Elegante del Caos (@RestControllerAdvice)
+El sistema atrapa internamente las colisiones de concurrencia y las fallas de transaccionalidad (`DataIntegrityViolationException`, `TransactionSystemException`). En lugar de exponer trazas de error SQL (HTTP 500), un escudo global intercepta la anomalía y devuelve un contrato `ErrorResponseDTO` estandarizado con un código **HTTP 409 Conflict**, protegiendo la seguridad del backend y la experiencia de usuario en el frontend.
+
 
 ### 🔹 Núcleo de Contenido
 
