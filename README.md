@@ -153,7 +153,15 @@ jwt.secret=tu_clave_secreta_super_larga_generada_para_seguridad_jwt
 ```
 (💡 Nota de Arquitectura: El sistema incluye un DataSeeder. Si la base de datos está vacía al arrancar, el sistema inyectará automáticamente la primera lección oficial con formato Markdown para facilitar las pruebas del Frontend).
 ---
+## 🛡️ Seguridad y Autenticación (JWT)
 
+El Motor de Decisiones implementa un sistema de seguridad **Stateless** basado en **JSON Web Tokens (JWT)**.
+
+La autenticación valida la identidad del usuario ("quién eres"), mientras la autorización controla los permisos dentro del sistema ("qué puedes hacer"). El servidor carece de sesiones en memoria; confía únicamente en firmas criptográficas herméticas.
+
+👉 [Ver la documentación completa de Seguridad, Rutas Protegidas y Flujos JWT aquí](SECURITY.md)
+
+---
 📡 Endpoints Principales
 1️⃣ Health Check (Ping)
 Verifica que el servidor está vivo.
