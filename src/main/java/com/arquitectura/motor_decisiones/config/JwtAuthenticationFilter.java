@@ -3,6 +3,8 @@ package com.arquitectura.motor_decisiones.config;
 import com.arquitectura.motor_decisiones.entity.Usuario;
 import com.arquitectura.motor_decisiones.repository.UsuarioRepository;
 import com.arquitectura.motor_decisiones.service.JwtService;
+import io.jsonwebtoken.security.SignatureException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 3. Extraemos el token (cortamos los primeros 7 caracteres: "Bearer ")
         jwt = authHeader.substring(7);
-
+        try {
         // 4. Extraemos el email desde el token
         userEmail = jwtService.extractUsername(jwt);
 
@@ -82,5 +84,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 8. Continuar con el resto de la cadena de filtros
         filterChain.doFilter(request, response);
+        } catch (SignatureException | MalformedJwtException ex) {
+            // ¡ATAQUE DETECTADO! Alguien alteró el token.
+            System.err.println("🚨 ALERTA DE SEGURIDAD: Intento de uso de token adulterado o malformado.");
+            manejarErrorDeFirma(response, "Firma del token inválida. Intento de adulteración detectado.");
+        }
+    }
+    // 🛡️ Método de Defensa: Construye la respuesta de rechazo directo en el Filtro
+    private void manejarErrorDeFirma(HttpServletResponse response, String mensaje) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // HTTP 401
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String jsonResponse = String.format("{\"error\": \"Unauthorized\", \"mensaje\": \"%s\"}", mensaje);
+        response.getWriter().write(jsonResponse);
     }
 }
