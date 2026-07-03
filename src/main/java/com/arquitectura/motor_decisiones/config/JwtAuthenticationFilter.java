@@ -91,6 +91,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
     // 🛡️ Método de Defensa: Construye la respuesta de rechazo directo en el Filtro
+    // estudio del concepto de defensa en profundidad.y tambien la prueba de que si esta funcionando en POSTMAN usando un JWT falso y este esta siendo rechazado.
+    /*
+    * Abre Postman.
+    Prepara una petición a una ruta protegida de tu sistema. Por ejemplo:
+    GET http://localhost:8080/api/v1/lecciones (o cualquier endpoint que exija autenticación).
+
+    Ve a la pestaña Authorization (justo debajo de la URL).
+
+    En la caja Type, selecciona Bearer Token.
+
+    En la caja de la derecha (Token), pega el token adulterado que fabricaste en jwt.io.
+
+    Presiona el botón azul Send.
+    * */
     private void manejarErrorDeFirma(HttpServletResponse response, String mensaje) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // HTTP 401
         response.setContentType("application/json");
