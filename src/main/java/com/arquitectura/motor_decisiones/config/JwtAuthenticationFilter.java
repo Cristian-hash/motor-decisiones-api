@@ -9,14 +9,18 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -107,8 +111,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     * */
     private void manejarErrorDeFirma(HttpServletResponse response, String mensaje) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // HTTP 401
-        response.setContentType("application/json");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
+
+        Map<String,Object> errorDetails = new HashMap<>();
+        errorDetails.put("error","Acceso denegado");
+        errorDetails.put("causa","Token manipulado o invalido");
+        errorDetails.put("mensaje",mensaje);
+        errorDetails.put("codigoEstado",HttpServletResponse.SC_UNAUTHORIZED);
+
+        // 3. Usamos ObjectMapper para traducir el Map de Java a un JSON perfecto y enviarlo al cliente
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(response.getWriter(),errorDetails);
 
         String jsonResponse = String.format("{\"error\": \"Unauthorized\", \"mensaje\": \"%s\"}", mensaje);
         response.getWriter().write(jsonResponse);
