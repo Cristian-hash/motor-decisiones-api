@@ -17,10 +17,10 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import tools.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import io.jsonwebtoken.ExpiredJwtException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -46,10 +46,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String userEmail;
         // 1. Ver si el header llega
         System.out.println("HEADER AUTHORIZATION: " + authHeader);
-
         // 2. Si no hay header o no empieza con "Bearer ", lo dejamos pasar.
         // (Spring Security lo bloqueará más adelante si la ruta es privada)
-        //2 mio Este bloque revisa si la petición trae un JWT con formato correcto y, si falta, permite que la petición siga su flujo normal para que Spring Security tome la decisión final.
+        // 2 mio Este bloque revisa si la petición trae un JWT con formato correcto y, si falta, permite que la petición siga su flujo normal para que Spring Security tome la decisión final.
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -88,43 +87,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 8. Continuar con el resto de la cadena de filtros
         filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException ex) {
+            // ⏳ Caso 1: El tiempo se agotó (Usuario honesto)
+            System.err.println("⏳ ALERTA: Token expirado.");
+            manejarErrorEstructurado(response,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    "Sesión terminada",
+                    "El token ha expirado. Por favor, inicie sesión nuevamente.");
         } catch (SignatureException | MalformedJwtException ex) {
             // ¡ATAQUE DETECTADO! Alguien alteró el token.
-            System.err.println("🚨 ALERTA DE SEGURIDAD: Intento de uso de token adulterado o malformado.");
-            manejarErrorDeFirma(response, "Firma del token inválida. Intento de adulteración detectado.");
+            System.err.println("🚨 ALERTA: Token adulterado o malformado.");
+            manejarErrorEstructurado(response,
+                                    HttpServletResponse.SC_UNAUTHORIZED,
+                                "Sesión terminada",
+                                "El token ha expirado. Por favor, inicie sesión nuevamente.");
         }
     }
-    // 🛡️ Método de Defensa: Construye la respuesta de rechazo directo en el Filtro
-    // estudio del concepto de defensa en profundidad.y tambien la prueba de que si esta funcionando en POSTMAN usando un JWT falso y este esta siendo rechazado.
-    /*
-    * Abre Postman.
-    Prepara una petición a una ruta protegida de tu sistema. Por ejemplo:
-    GET http://localhost:8080/api/v1/lecciones (o cualquier endpoint que exija autenticación).
-
-    Ve a la pestaña Authorization (justo debajo de la URL).
-
-    En la caja Type, selecciona Bearer Token.
-
-    En la caja de la derecha (Token), pega el token adulterado que fabricaste en jwt.io.
-
-    Presiona el botón azul Send.
-    * */
-    private void manejarErrorDeFirma(HttpServletResponse response, String mensaje) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // HTTP 401
+    // 🛡️ Método de Defensa Reutilizable
+    private void manejarErrorEstructurado(HttpServletResponse response, int statusCode,String error,String causa) throws IOException {
+        response.setStatus(statusCode);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
         Map<String,Object> errorDetails = new HashMap<>();
-        errorDetails.put("error","Acceso denegado");
-        errorDetails.put("causa","Token manipulado o invalido");
-        errorDetails.put("mensaje",mensaje);
-        errorDetails.put("codigoEstado",HttpServletResponse.SC_UNAUTHORIZED);
-
-        // 3. Usamos ObjectMapper para traducir el Map de Java a un JSON perfecto y enviarlo al cliente
+        errorDetails.put("error",error);
+        errorDetails.put("causa",causa);
+        errorDetails.put("codigoEstado",statusCode);
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getWriter(),errorDetails);
-
-        String jsonResponse = String.format("{\"error\": \"Unauthorized\", \"mensaje\": \"%s\"}", mensaje);
-        response.getWriter().write(jsonResponse);
     }
 }
