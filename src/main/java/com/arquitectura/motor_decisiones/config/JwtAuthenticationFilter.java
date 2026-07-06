@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtService = jwtService;
         this.usuarioRepository = usuarioRepository;
     }
-    //0 Este metodo es la puerta principal, recibe la peticion, y decide si la deja continuar por la cadena de filtros
+    //Este metodo es la puerta principal, recibe la peticion, y decide si la deja continuar por la cadena de filtros
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,//El filtro recibe esa petición en request
@@ -40,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain//Cadena de filtros
     ) throws ServletException, IOException {
 
+        jwt = authHeader.substring(7);
         // 1. Estas líneas preparan y extraen la información inicial necesaria para identificar al usuario mediante JWT.
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
