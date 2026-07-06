@@ -40,7 +40,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain//Cadena de filtros
     ) throws ServletException, IOException {
 
-        jwt = authHeader.substring(7);
         // 1. Estas líneas preparan y extraen la información inicial necesaria para identificar al usuario mediante JWT.
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
@@ -60,6 +59,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
         // 4. Extraemos el email desde el token
         userEmail = jwtService.extractUsername(jwt);
+
+        String estadoCuenta = jwtService.extractClaim(jwt,claims -> claims.get("estado", String.class));
+
+        if("SUSPENDIDO".equals(estadoCuenta)) {
+            System.err.println("ADUANA: Bloqueo inmediato. El token pertenece a una cuenta suspendida");
+            manejarErrorEstructurado(
+                    response,
+                    HttpServletResponse.SC_FORBIDDEN,
+                    "Acceso Denegado",
+                    "Su cuenta se encuentra suspendida por infracciones en la plataforma"
+            );
+            return;
+        }
 
         System.out.println("USUARIO EXTRAÍDO DEL TOKEN: " + userEmail);
         // 5. Si hay un email y el usuario aún no está autenticado en el contexto actual

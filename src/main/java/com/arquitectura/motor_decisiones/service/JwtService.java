@@ -60,7 +60,7 @@ public class JwtService {
     }
 
     // Método maestro para decodificar cualquier dato del Payload
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         final Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
