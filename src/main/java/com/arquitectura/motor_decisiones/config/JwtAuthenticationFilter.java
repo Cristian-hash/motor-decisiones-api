@@ -107,7 +107,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     HttpServletResponse.SC_UNAUTHORIZED,
                     "Sesión terminada",
                     "El token ha expirado. Por favor, inicie sesión nuevamente.");
-        } catch (SignatureException | MalformedJwtException ex) {
+        } catch (SignatureException | MalformedJwtException | IllegalArgumentException ex ) {
             // ¡ATAQUE DETECTADO! Alguien alteró el token.
             System.err.println("🚨 ALERTA: Token adulterado o malformado.");
             manejarErrorEstructurado(response,

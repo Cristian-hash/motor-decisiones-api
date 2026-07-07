@@ -160,15 +160,14 @@ En lugar de permitir que el servidor colapse con errores `500 Internal Server Er
   "causa": "El token ha expirado. Por favor, inicie sesión nuevamente.",
   "codigoEstado": 401
 }
----
 
-## 🎯 Ejemplo Conceptual
+ 🎯 Ejemplo Conceptual
 
-### 🔐 Autenticación
+🔐 Autenticación
 
-```text
+text
 “Demuestra quién eres”
-```
+
 
 El usuario inicia sesión y obtiene un JWT.
 
@@ -227,3 +226,27 @@ Resultado:
 > La seguridad moderna basada en JWT permite construir APIs desacopladas, escalables y sin sesiones persistentes en servidor.
 > 
 > 
+> ---
+
+## 🧪 Auditoría de Seguridad (Pruebas E2E)
+
+El Motor de Decisiones cuenta con una muralla defensiva validada empíricamente mediante simulación de ataques. El sistema garantiza cero colapsos ante estos vectores:
+
+### 🟢 Escenario 1: El Camino Feliz
+* **Acción:** Petición con JWT íntegro y vigente.
+* **Resultado:** `200 OK`. El sistema autoriza el acceso a la ruta protegida.
+
+### 🔴 Escenario 2: El Intruso Torpe (Firma Rota o Texto Mutilado)
+* **Acción:** Petición alterando o borrando la última letra del JWT en la cabecera.
+* **Excepción:** `SignatureException` o `IllegalArgumentException`.
+* **Resultado:** `401 Unauthorized`. El filtro rechaza la forma física o criptográfica del pase y devuelve el JSON de defensa.
+
+### 🔴 Escenario 3: El Hacker Astuto (Payload Adulterado)
+* **Acción:** Petición modificando el rol o email en jwt.io, manteniendo el formato Base64 intacto.
+* **Excepción:** `SignatureException`.
+* **Resultado:** `401 Unauthorized`. El motor matemático detecta la manipulación de datos y frena el acceso.
+
+### 🟡 Escenario 4: El Ladrón de Tiempo (Expiración)
+* **Acción:** Petición con un JWT legítimo pero con fecha de expiración caducada.
+* **Excepción:** `ExpiredJwtException`.
+* **Resultado:** `401 Unauthorized`. El filtro clasifica el evento como "Sesión terminada" e invita al usuario a renovar su acceso mediante un JSON amigable.
