@@ -119,12 +119,12 @@ Usuario autenticado → acceso permitido a endpoints privados
 
 ## 🔥 Características de Seguridad
 
-✅ Arquitectura Stateless  
-✅ Validación mediante JWT firmado  
-✅ Protección de endpoints privados  
-✅ Filtros de autenticación personalizados  
-✅ Integración con Spring Security  
-✅ Separación clara entre autenticación y autorización
+✅ Arquitectura Stateless sin sesiones en memoria.
+✅ Validación mediante JWT firmado criptográficamente.
+✅ Filtros de autenticación personalizados integrados con Spring Security.
+✅ **Edge Security:** Validación estricta de Claims en la frontera del sistema para bloquear intrusos y cuentas suspendidas con latencia cero (sin consultar la base de datos).
+✅ **Defensa en Profundidad:** Intercepción de fraudes y caducidad a nivel de Filtros (Filter Chain), devolviendo respuestas JSON estandarizadas.
+✅ Separación clara entre Autenticación (401) y Autorización (403).
 
 ---
 
@@ -142,7 +142,24 @@ Respuesta típica:
 ```http
 403 Forbidden
 ```
+## 🛑 Intercepción en la Frontera (Edge Validation)
 
+El sistema no espera a que las peticiones lleguen a la capa de Controladores o a la Base de Datos para ser rechazadas. Toda la validación criptográfica y de negocio ocurre en la frontera del sistema mediante el `JwtAuthenticationFilter`.
+
+### 🛡️ Defensa en Profundidad (Manejo de Excepciones en Filtros)
+En lugar de permitir que el servidor colapse con errores `500 Internal Server Error`, el filtro captura las anomalías criptográficas y utiliza `ObjectMapper` para escribir respuestas JSON nativas y estructuradas directamente en el flujo `HttpServletResponse`.
+
+#### Caso 1: Caducidad (Flujo Normal)
+* **Escenario:** El estudiante tardó demasiado y su sesión caducó.
+* **Excepción atrapada:** `ExpiredJwtException`
+* **Respuesta HTTP:** `401 Unauthorized`
+* **Cuerpo JSON:**
+```json
+{
+  "error": "Sesión terminada",
+  "causa": "El token ha expirado. Por favor, inicie sesión nuevamente.",
+  "codigoEstado": 401
+}
 ---
 
 ## 🎯 Ejemplo Conceptual
@@ -208,3 +225,5 @@ Resultado:
 ## 🏛️ Principio Arquitectónico
 
 > La seguridad moderna basada en JWT permite construir APIs desacopladas, escalables y sin sesiones persistentes en servidor.
+> 
+> 
