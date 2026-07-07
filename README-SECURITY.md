@@ -165,8 +165,7 @@ En lugar de permitir que el servidor colapse con errores `500 Internal Server Er
 
 🔐 Autenticación
 
-text
-“Demuestra quién eres”
+text: “Demuestra quién eres”
 
 
 El usuario inicia sesión y obtiene un JWT.
@@ -189,6 +188,26 @@ El sistema decide si el usuario puede acceder a recursos protegidos.
 > El frontend solo transporta el token.
 > La lógica de autorización vive en el servidor.
 
+---
+## 🛡️ Arquitectura de Seguridad (JWT a Fondo)
+
+El sistema implementa seguridad de nivel industrial utilizando **JSON Web Tokens (JWT)**. La estrategia de seguridad no se basa en "ocultar" información, sino en garantizar matemáticamente la **inmutabilidad y la autenticidad** de la identidad del usuario.
+
+### 1. Codificación vs. Firma Criptográfica
+Para proteger los endpoints, el sistema diferencia estrictamente entre el transporte y la validación:
+* **Payload (Base64):** Los datos del usuario (como el ID o el Rol) viajan codificados en Base64. Esto permite un transporte ágil a través de HTTP, pero entendiendo que es de lectura pública.
+* **Firma (HMAC SHA-256):** Es el "sello de cera" del servidor. Se genera uniendo el Payload, el Header y una Llave Secreta del servidor, pasados por un algoritmo de hash.
+
+**Defensa contra manipulaciones:** Si un atacante intercepta el token e intenta elevar sus privilegios (ej. cambiando su rol de `USER` a `ADMIN` en el Payload), la firma matemática original se rompe. El servidor detecta la alteración y rechaza la petición instantáneamente.
+
+### 2. Intercepción en la Frontera (Filtros Stateless)
+Para evitar que ataques maliciosos o tokens caducados lleguen a la capa de negocio (Controllers/Services) y generen errores 500, el sistema cuenta con un `OncePerRequestFilter`.
+
+Este filtro actúa como aduana y atrapa excepciones criptográficas en tiempo real:
+* Si detecta `SignatureException` ➔ Bloquea el ataque por token adulterado.
+* Si detecta `ExpiredJwtException` ➔ Redirige al usuario por sesión finalizada.
+
+En ambos casos, el filtro interrumpe el flujo y responde directamente con un **JSON estructurado (HTTP 401 Unauthorized)**, protegiendo la integridad del Backend y garantizando una experiencia predecible para el Frontend.
 ---
 
 ## 🚀 Demostración Funcional
