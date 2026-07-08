@@ -25,10 +25,9 @@ public class GlobalExceptionHandler {
     }
 
     // 2. NUEVO ESCUDO: Atrapa el Candado de Titanio (Unique Constraint SQL)
-// EL NUEVO ESCUDO INTELIGENTE: Atrapa violaciones directas O envueltas en transacciones
+    // EL NUEVO ESCUDO INTELIGENTE: Atrapa violaciones directas O envueltas en transacciones
     @ExceptionHandler({DataIntegrityViolationException.class, TransactionSystemException.class})
     public ResponseEntity<ErrorResponseDTO> manejarErroresDeIntegridadYTransaccion(Exception ex) {
-
         // Verificamos si el error gigante tiene la violación de integridad escondida adentro
         Throwable causaRaiz = ex.getCause();
         if (causaRaiz instanceof DataIntegrityViolationException || ex instanceof DataIntegrityViolationException) {
@@ -70,5 +69,4 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
-
 }
