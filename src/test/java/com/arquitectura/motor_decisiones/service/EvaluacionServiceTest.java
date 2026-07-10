@@ -7,6 +7,7 @@ import com.arquitectura.motor_decisiones.entity.Progreso;
 import com.arquitectura.motor_decisiones.entity.Usuario;
 import com.arquitectura.motor_decisiones.enums.TipoEvaluacion;
 import com.arquitectura.motor_decisiones.events.EventPublisher;
+import com.arquitectura.motor_decisiones.exception.LeccionYaCompletadaException;
 import com.arquitectura.motor_decisiones.repository.LeccionRepository;
 import com.arquitectura.motor_decisiones.repository.ProgresoRepository;
 import com.arquitectura.motor_decisiones.repository.UsuarioRepository;
@@ -21,8 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -89,8 +89,11 @@ public class EvaluacionServiceTest {
         when(progresoRepository.existsByUsuarioIdAndLeccionIdAndCompletadoTrue(1L,100L))
                 .thenReturn(true);
 
+        assertThrows(LeccionYaCompletadaException.class,()->{
+            evaluacionService.evaluarDecision(dto);
+        });
 
+        verify(progresoRepository,never()).save(any(Progreso.class));
 
     }
-
 }
