@@ -81,6 +81,16 @@ public class EvaluacionServiceTest {
 
     }
 
+    @Test
+    void lanzarExcepcionSiLeccionYaEstaCompletada(){
+        //1
+        RespuestaEstudianteDTO dto = new RespuestaEstudianteDTO(1L,100L,1L);
+        //2-
+        when(progresoRepository.existsByUsuarioIdAndLeccionIdAndCompletadoTrue(1L,100L))
+                .thenReturn(true);
 
+
+
+    }
 
 }
