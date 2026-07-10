@@ -96,4 +96,42 @@ public class EvaluacionServiceTest {
         verify(progresoRepository,never()).save(any(Progreso.class));
 
     }
+
+    @Test
+    void debeDelegarLaEvaluacionALaEstrategiaCorrecta() {
+        RespuestaEstudianteDTO dto = new RespuestaEstudianteDTO(1L, 100L, 1L);
+
+        Leccion leccionFalsa = new Leccion();
+        leccionFalsa.setId(100L);
+        leccionFalsa.setTipoEvaluacion(TipoEvaluacion.OPCION_UNICA);
+
+        Usuario usuarioFalso = new Usuario();
+        usuarioFalso.setId(1L);
+
+        // Creamos el "Chef falso" (Mock de la estrategia)
+        EstrategiaEvaluacion estrategiaMock = mock(EstrategiaEvaluacion.class);
+        FeedbackDTO feedbackEsperado = new FeedbackDTO(true,"¡Perfecto!",10,"sigue avanzando");
+
+        //Control Mental básico(pasar el escudo)
+        when(progresoRepository.existsByUsuarioIdAndLeccionIdAndCompletadoTrue(1L,100L))
+                .thenReturn(false);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioFalso));
+        when(leccionRepository.findById(100L)).thenReturn(Optional.of(leccionFalsa));
+
+        // Control mental ARQUITECTÓNICO (La Fábrica entrega al Chef falso)
+        when(factory.obtenerEstrategia(TipoEvaluacion.OPCION_UNICA)).thenReturn(estrategiaMock);
+
+        // Le decimos al Chef falso qué cocinar (El altavoz)
+        when(estrategiaMock.evaluar(dto,leccionFalsa)).thenReturn(feedbackEsperado);
+
+        // --- 2. WHEN (Actuar) ---
+        FeedbackDTO resultado = evaluacionService.evaluarDecision(dto);
+
+        // --- 3. THEN (Verificar) ---
+        // 1. Verificamos que el resultado sea el que preparó el Chef falso
+        assertEquals(feedbackEsperado,resultado);
+
+        // 2. LA PRUEBA DE ORO: Verificamos que el Service SÍ llamó al método evaluar() de la estrategia
+        verify(estrategiaMock,times(1)).evaluar(dto,leccionFalsa);
+    }
 }
