@@ -24,7 +24,6 @@ public class EvaluacionOpcionUnicaStrategy implements EstrategiaEvaluacion {
                 .filter(opcion -> opcion.getId().equals(respuesta.opcionSeleccionadaId()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("La opción seleccionada no se encuentra en la lección"));
-
         // 2. Evaluamos si es correcta usando TU getter
         boolean esCorrecta = opcionSeleccionada.getEsCorrecta();
         // 3. Extraemos el feedback específico usando TU getter

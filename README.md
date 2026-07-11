@@ -35,6 +35,14 @@ El sistema está construido sobre un stack moderno y robusto:
 
 El diseño separa claramente responsabilidades para permitir escalabilidad y evolución del sistema.
 
+## 🧪 Resiliencia y Pruebas (TDD)
+
+Este sistema no solo implementa la lógica de negocio, sino que garantiza su fiabilidad matemática mediante una arquitectura orientada a pruebas.
+
+- **Escudo de Idempotencia (Anti-Fraude):** El motor de evaluación está diseñado para ser seguro ante fallos de red o intentos de doble envío (doble clic). La API bloquea activamente la duplicación de progreso sin alterar el estado del sistema, lanzando excepciones controladas (`LeccionYaCompletadaException`) que evitan la corrupción de datos.
+- **Aislamiento con Mockito:** La lógica central (*Service Layer*) está testeada unitariamente de forma aislada. Se utiliza **Mockito** para simular los repositorios y las dependencias (como el Patrón Factory y Strategy), garantizando que las pruebas auditen exclusivamente el comportamiento y la delegación de responsabilidades del negocio, independientemente de la infraestructura (PostgreSQL).
+- **Testing de Comportamiento:** Las pruebas no solo validan resultados matemáticos, sino que auditan la arquitectura aplicando `verify()` para asegurar que el sistema cumple con los principios SOLID (ej. confirmando la delegación estricta de la evaluación a las estrategias correspondientes).
+
 ### 🔹 Núcleo de Identidad
 
 * `Usuario`
