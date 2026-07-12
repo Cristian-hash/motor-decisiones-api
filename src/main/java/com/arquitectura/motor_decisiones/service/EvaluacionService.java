@@ -50,7 +50,7 @@ public class EvaluacionService {
     }
     @Transactional // Garantiza que si falla el guardado, no haya datos inconsistentes
     public FeedbackDTO evaluarDecision(RespuestaEstudianteDTO dto) {
-        // 1. REGLA ANTIFRAUDE (Tu lógica aquí está perfecta)
+        // 1. REGLA ANTIFRAUDE
         boolean yaAprobo = progresoRepository.existsByUsuarioIdAndLeccionIdAndCompletadoTrue(
                 dto.usuarioId(), dto.leccionId());
         if (yaAprobo) {
