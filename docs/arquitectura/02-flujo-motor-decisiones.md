@@ -1,65 +1,42 @@
-```plantuml
-@startuml
-skinparam ArchimateBackgroundColor #FFFFFF
-skinparam ActivityBackgroundColor #FFFFFF
-skinparam ActivityBorderColor #333333
-skinparam ArrowColor #333333
+![Orquestación del Motor de Decisiones](images/02-motor-decisiones.png)
 
-|🛎️ Cliente / Controller|
-start
-:evaluarDecision(RespuestaEstudianteDTO dto);
+sequenceDiagram
+participant C as 🛎️ Controller (Recepcionista)
+participant S as 🧠 Service y Factory (Profesor Calificador)
+participant R as 🗄️ Repositorios y Eventos (Registro)
 
-|🧠 EvaluacionService y Factory|
-:1. REGLA ANTIFRAUDE;
-
-|🗄️ Repositorios y Eventos|
-if (progresoRepository\n.existsByUsuarioIdAndLeccionIdAndCompletadoTrue?) then (sí)
-|🧠 EvaluacionService y Factory|
-:throw LeccionYaCompletadaException\n("FRAUDE DETECTADO");
-|🛎️ Cliente / Controller|
-detach
-else (no)
-
-    |🗄️ Repositorios y Eventos|
-    :2. EXTRAER DATOS\nusuarioRepository.findById(dto.usuarioId())\nleccionRepository.findById(dto.leccionId());
+    C->>S: 1. evaluarDecision(RespuestaEstudianteDTO)
     
-    |🧠 EvaluacionService y Factory|
-    :3. ORQUESTAR\nEstrategiaEvaluacion estrategia = \nfactory.obtenerEstrategia(leccion.getTipoEvaluacion());
-    :4. DELEGAR\nFeedbackDTO feedback = \nestrategia.evaluar(dto, leccion);
+    Note over S,R: 2. REGLA ANTIFRAUDE
+    S->>R: ¿Existe progreso previo completado?
+    R-->>S: Resultado de la búsqueda (verdadero/falso)
 
-    if (feedback.esCorrecto()?) then (sí)
-        :5. CALCULAR PUNTOS\nint puntosGanados = \nestrategiaPuntos.calcularPuntos(usuario, leccion);
-        :usuario.setPuntosExperiencia(...);
+    alt Fraude Detectado (Verdadero)
+        S-->>C: 🛑 throw LeccionYaCompletadaException
+    else Evaluación Válida (Falso)
+        Note over S,R: 3. EXTRAER DATOS
+        S->>R: Solicita Entidades (Usuario, Lección)
+        R-->>S: Devuelve Datos crudos
         
-        |🗄️ Repositorios y Eventos|
-        :usuarioRepository.save(usuario);
-    else (no)
-        |🧠 EvaluacionService y Factory|
-    endif
-
-    |🧠 EvaluacionService y Factory|
-    :6. PREPARAR PROGRESO\nProgreso nuevoProgreso = new Progreso(...);
-
-    |🗄️ Repositorios y Eventos|
-    :progresoRepository.save(nuevoProgreso);
-
-    |🧠 EvaluacionService y Factory|
-    if (feedback.esCorrecto()?) then (sí)
-        :7. EMITIR EVENTO\nLeccionCompletadaEvent event = new LeccionCompletadaEvent(...);
+        Note over S: 4. ORQUESTAR Y DELEGAR
+        S->>S: factory.obtenerEstrategia()
+        S->>S: feedback = estrategia.evaluar()
         
-        |🗄️ Repositorios y Eventos|
-        :eventPublisher.publicarLeccionCompletada(event);
-    else (no)
-        |🧠 EvaluacionService y Factory|
-    endif
-
-endif
-
-|🧠 EvaluacionService y Factory|
-:return feedback;
-
-|🛎️ Cliente / Controller|
-:Recibe FeedbackDTO;
-stop
-@enduml
-```
+        alt Respuesta Correcta
+            Note over S,R: 5. CALCULAR PUNTOS
+            S->>S: Incrementa XP del usuario
+            S->>R: usuarioRepository.save()
+        end
+        
+        Note over S,R: 6. PREPARAR Y GUARDAR PROGRESO
+        S->>S: Crea nuevo objeto Progreso
+        S->>R: progresoRepository.save()
+        
+        alt Respuesta Correcta
+            Note over S,R: 7. EMITIR EVENTO
+            S->>R: publicarLeccionCompletada(event)
+        end
+        
+        Note over S,C: 8. EMPAQUETAR RESULTADO
+        S-->>C: Devuelve FeedbackDTO
+    end
