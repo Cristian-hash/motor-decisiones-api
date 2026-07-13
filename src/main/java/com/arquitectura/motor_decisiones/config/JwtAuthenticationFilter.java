@@ -59,7 +59,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
         // 4. Extraemos el email desde el token
         userEmail = jwtService.extractUsername(jwt);
-
         String estadoCuenta = jwtService.extractClaim(jwt,claims -> claims.get("estado", String.class));
 
         if("SUSPENDIDO".equals(estadoCuenta)) {
@@ -75,7 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         System.out.println("USUARIO EXTRAÍDO DEL TOKEN: " + userEmail);
         // 5. Si hay un email y el usuario aún no está autenticado en el contexto actual
-        // 5. MIO Este bloque valida el JWT, verifica al usuario en la base de datos y registra oficialmente al usuario autenticado dentro de Spring Security.
+        // MIO Este bloque valida el JWT, verifica al usuario en la base de datos y registra oficialmente al usuario autenticado dentro de Spring Security.
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             // Buscamos al usuario en la base de datos
