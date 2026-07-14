@@ -1,3 +1,30 @@
+sequenceDiagram
+participant E as 🧠 EvaluacionService (Periodista / Productor)
+participant K as 🌪️ Apache Kafka (El Quiosco / Topic)
+participant L as 🏆 LogrosService (Lector / Consumidor)
+participant N as 📧 NotificacionService (Lector / Consumidor)
+
+    Note over E: El estudiante responde correctamente
+    E->>E: Guarda progreso en BD
+
+    Note over E,K: El Periodista imprime la noticia y la lanza al quiosco
+    E-)K: 📢 Publica LeccionCompletadaEvent (JSON)
+
+    Note right of E: El EvaluacionService NO ESPERA.<br/>Termina su trabajo y devuelve<br/>el DTO al Frontend inmediatamente.
+
+    Note over K,N: Los lectores compran el periódico a su propio ritmo
+
+    par Consumidor 1
+        K-)L: 🎧 Lee el evento
+        L->>L: Otorga medalla al usuario
+    and Consumidor 2
+        K-)N: 🎧 Lee el evento
+        N->>N: Envía email de felicitación
+    end
+
+    Note over L,N: Si uno de estos servicios falla o es lento,<br/>el Motor de Evaluación jamás se entera ni se cae.
+
+
 @startuml
 skinparam BackgroundColor #FFFFFF
 skinparam ArrowColor #333333
