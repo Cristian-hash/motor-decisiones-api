@@ -4,7 +4,7 @@ import com.arquitectura.motor_decisiones.dto.FeedbackDTO;
 import com.arquitectura.motor_decisiones.dto.RespuestaEstudianteDTO;
 import com.arquitectura.motor_decisiones.entity.Leccion;
 import com.arquitectura.motor_decisiones.enums.TipoEvaluacion;
-
+//Patron Strategy
 public interface EstrategiaEvaluacion {
     // Todas las estrategias del futuro DEBEN tener este método
     FeedbackDTO evaluar(RespuestaEstudianteDTO respuesta, Leccion leccion);

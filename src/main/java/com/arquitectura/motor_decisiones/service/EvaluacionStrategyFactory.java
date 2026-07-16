@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+//Patron Factory
 public class EvaluacionStrategyFactory {
     private final Map<TipoEvaluacion, EstrategiaEvaluacion> estrategias;
 
