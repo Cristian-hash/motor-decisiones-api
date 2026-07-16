@@ -92,7 +92,10 @@ public class EvaluacionService {
                 leccion,
                 feedback.esCorrecto()
         );
-
+        // ARQUITECTURA: Decisión de Inmutabilidad (Append-Only)
+        // En lugar de hacer UPDATE y borrar el puntaje anterior del alumno,
+        // hacemos un INSERT (nuevo registro) por cada intento.
+        // Esto garantiza la auditoría perfecta y la trazabilidad de su aprendizaje.
         progresoRepository.save(nuevoProgreso);
 
         // 7. EMITIR EVENTO A KAFKA / OTROS SISTEMAS
