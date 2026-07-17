@@ -41,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         // 1. Estas líneas preparan y extraen la información inicial necesaria para identificar al usuario mediante JWT.
+        // Sacamos el token del Header
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
@@ -56,6 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 3. Extraemos el token (cortamos los primeros 7 caracteres: "Bearer ")
         jwt = authHeader.substring(7);
+        // 🔥 AQUI ESTÁ EL ESCUDO (El Escáner del Guardia)
         try {
         // 4. Extraemos el email desde el token
         userEmail = jwtService.extractUsername(jwt);
@@ -98,6 +100,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 8. Continuar con el resto de la cadena de filtros
+            // Si todo sale bien, el guardia abre la puerta de acero:
         filterChain.doFilter(request, response);
         } catch (ExpiredJwtException ex) {
             // ⏳ Caso 1: El tiempo se agotó (Usuario honesto)
