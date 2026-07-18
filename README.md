@@ -43,6 +43,16 @@ Este sistema no solo implementa la lógica de negocio, sino que garantiza su fia
 - **Aislamiento con Mockito:** La lógica central (*Service Layer*) está testeada unitariamente de forma aislada. Se utiliza **Mockito** para simular los repositorios y las dependencias (como el Patrón Factory y Strategy), garantizando que las pruebas auditen exclusivamente el comportamiento y la delegación de responsabilidades del negocio, independientemente de la infraestructura (PostgreSQL).
 - **Testing de Comportamiento:** Las pruebas no solo validan resultados matemáticos, sino que auditan la arquitectura aplicando `verify()` para asegurar que el sistema cumple con los principios SOLID (ej. confirmando la delegación estricta de la evaluación a las estrategias correspondientes).
 
+### 📢 Arquitectura Orientada a Eventos (Publish-Subscribe)
+
+Para garantizar la **Resiliencia** y el **Bajo Acoplamiento** en el Motor de Decisiones, el sistema central no se comunica directamente con módulos secundarios (como Recompensas, Gamificación o Notificaciones).
+
+En su lugar, aplicamos el patrón **Publish-Subscribe**.
+
+* **El Problema Evitado:** Si el `EvaluacionService` llamara directamente al servicio de correos y este fallara, la evaluación completa del estudiante arrojaría un Error 500, arruinando la experiencia de usuario.
+* **La Solución Implementada:** El `EvaluacionService` funciona como un megáfono. Una vez que califica y guarda en la base de datos de forma inmutable, empaqueta los datos en un evento en tiempo pasado (`LeccionCompletadaEvent`) y lo publica en el bus de mensajes.
+* **El Resultado (Open/Closed Principle):** El evaluador no sabe ni le importa quién lo escucha. Si mañana el negocio requiere un nuevo "Sistema de Ranking Global", solo se añade un nuevo `Listener` sin tocar ni una sola línea del código central. Si un servicio secundario se cae, el estudiante sigue viendo su lección como aprobada, logrando **Tolerancia a Fallos**.
+
 ### 🔹 Núcleo de Identidad
 
 * `Usuario`
