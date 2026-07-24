@@ -1,4 +1,3 @@
-````markdown
 # ⚙️ Motor de Decisiones API (Backend)
 
 > **Plataforma inteligente de aprendizaje gamificado para la enseñanza de patrones de diseño y toma de decisiones arquitectónicas.**
@@ -273,6 +272,16 @@ Funciona como la memoria permanente.
 
 ---
 
+# 🧱 Arquitectura de Frontend Ciego (Desacoplamiento Total)
+
+Este proyecto rechaza deliberadamente el uso de aplicaciones monolíticas acopladas (como renderizado de vistas con Thymeleaf o Vaadin). En su lugar, se implementa una arquitectura distribuida donde el Backend y el Frontend operan de forma 100% independiente:
+
+* **El Servidor es el Único Juez (Spring Boot):** La lógica de evaluación, el cálculo de puntajes y la validación de integridad viven protegidos detrás de una API REST. El backend es *stateless* y se defiende mediante filtros de seguridad JWT y escudos de idempotencia.
+* **El Cliente es Ciego (Angular Standalone):** El frontend actúa exclusivamente como una interfaz de usuario esclava de los datos. Se limita a capturar eventos (`click`, `input`), empaquetarlos en DTOs seguros y despacharlos mediante peticiones asíncronas. Angular jamás evalúa si una respuesta es correcta o incorrecta, erradicando por completo el riesgo de manipulación de código en el navegador por parte del usuario final.
+* **Seguridad Fronteriza Automatizada:** Las credenciales (JWT) no contaminan la capa de servicios del cliente. Se inyectan dinámicamente utilizando un `HttpInterceptor` global, garantizando que todo el tráfico saliente esté autenticado por defecto.
+
+---
+
 # 🔐 DTOs (Seguridad Fronteriza)
 
 Las entidades de la base de datos permanecen dentro del servidor.
@@ -394,7 +403,7 @@ Cada una evoluciona de forma independiente.
 ## 1. Clonar el proyecto
 
 ```bash
-git clone https://github.com/TuUsuario/motor-decisiones-api.git
+git clone [https://github.com/TuUsuario/motor-decisiones-api.git](https://github.com/TuUsuario/motor-decisiones-api.git)
 
 cd motor-decisiones-api
 ```
