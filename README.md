@@ -279,6 +279,42 @@ Este proyecto rechaza deliberadamente el uso de aplicaciones monolíticas acopla
 * **El Servidor es el Único Juez (Spring Boot):** La lógica de evaluación, el cálculo de puntajes y la validación de integridad viven protegidos detrás de una API REST. El backend es *stateless* y se defiende mediante filtros de seguridad JWT y escudos de idempotencia.
 * **El Cliente es Ciego (Angular Standalone):** El frontend actúa exclusivamente como una interfaz de usuario esclava de los datos. Se limita a capturar eventos (`click`, `input`), empaquetarlos en DTOs seguros y despacharlos mediante peticiones asíncronas. Angular jamás evalúa si una respuesta es correcta o incorrecta, erradicando por completo el riesgo de manipulación de código en el navegador por parte del usuario final.
 * **Seguridad Fronteriza Automatizada:** Las credenciales (JWT) no contaminan la capa de servicios del cliente. Se inyectan dinámicamente utilizando un `HttpInterceptor` global, garantizando que todo el tráfico saliente esté autenticado por defecto.
+* **Entrada (Backend):** Las peticiones cruzadas se gestionan mediante una política de **CORS Global** en la capa de seguridad (`SecurityConfig`), evitando el uso repetitivo y riesgoso de anotaciones `@CrossOrigin` en los controladores.
+
+### 📊 Diagrama de Secuencia End-to-End (Cliente Ciego ➔ Backend)
+
+```mermaid
+graph LR
+    %% Definición de Estilos
+    classDef frontend fill:#dd0031,stroke:#fff,stroke-width:2px,color:#fff;
+    classDef aduana fill:#fbc02d,stroke:#fff,stroke-width:2px,color:#000;
+    classDef backend fill:#6db33f,stroke:#fff,stroke-width:2px,color:#fff;
+    classDef user fill:#8e44ad,stroke:#fff,stroke-width:2px,color:#fff;
+
+    %% Nodos
+    U((🧑‍🎓 Alumno)):::user
+    
+    subgraph ANGULAR ["Frontend Ciego (Angular)"]
+        HTML["🖼️ app.component.html<br>La Vitrina (@if, @for)"]:::frontend
+        TS["⚙️ app.component.ts<br>El Empacador"]:::frontend
+        SVC["🚚 leccion.service.ts<br>El Mensajero"]:::frontend
+    end
+
+    subgraph FRONTERA ["Red / Seguridad"]
+        INT{"🦾 auth.interceptor.ts<br>El Brazo Robótico"}:::aduana
+    end
+
+    subgraph SPRING_BOOT ["El Juez (Backend)"]
+        API["🧠 Controller / Service<br>Motor de Decisiones"]:::backend
+    end
+
+    %% Flujo de datos
+    U -- "1. Lee y hace (click)" --> HTML
+    HTML -- "2. Pasa el ID" --> TS
+    TS -- "3. Crea RespuestaDTO" --> SVC
+    SVC -- "4. Inicia Petición HTTP" --> INT
+    INT -- "5. Inyecta Header: Bearer JWT" --> API
+    API -- "6. Devuelve FeedbackDTO" --> HTML
 
 ---
 
