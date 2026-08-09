@@ -40,7 +40,7 @@ public class EvaluacionServiceTest {
     @Test
     void debeRetornarCeroCuandoCountEsInvocadoEnUnMock() {
         long total = progresoRepository.count();
-        assertEquals(99,total);
+        assertEquals(0,total);
     }
     @Test
     void debeOtorgarPuntosSiRespuestaEsCorrecta(){
