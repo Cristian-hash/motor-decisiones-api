@@ -7,5 +7,10 @@ pipeline{
                 sh './mvnw clean package -DskipTests'
             }
         }
+        stage('Test'){
+            steps{
+                sh './mvnw test'
+            }
+        }
     }
 }

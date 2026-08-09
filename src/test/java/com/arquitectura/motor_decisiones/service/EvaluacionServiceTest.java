@@ -40,7 +40,7 @@ public class EvaluacionServiceTest {
     @Test
     void debeRetornarCeroCuandoCountEsInvocadoEnUnMock() {
         long total = progresoRepository.count();
-        assertEquals(0,total);
+        assertEquals(99,total);
     }
     @Test
     void debeOtorgarPuntosSiRespuestaEsCorrecta(){
@@ -134,4 +134,6 @@ public class EvaluacionServiceTest {
         // 2. LA PRUEBA DE ORO: Verificamos que el Service SÍ llamó al método evaluar() de la estrategia
         verify(estrategiaMock,times(1)).evaluar(dto,leccionFalsa);
     }
+
+
 }
