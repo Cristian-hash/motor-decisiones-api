@@ -5,7 +5,7 @@ pipeline{
         stage('Build Backend'){
             steps {
                 sh 'chmod +x mvnw'
-                sh './mvnw clean package -DskipTests'
+                sh './mvnw clean package -DskipTests -Dfile.encoding=UTF-8'
             }
         }
         stage('Test'){
