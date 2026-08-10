@@ -13,5 +13,10 @@ pipeline{
                 sh './mvnw test'
             }
         }
+        post{
+            success{
+                archiveArtifacts archiveArtifacts: 'target/*.jar',fingerprint: true
+            }
+        }
     }
 }
