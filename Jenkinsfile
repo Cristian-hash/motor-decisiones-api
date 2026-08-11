@@ -19,7 +19,7 @@ pipeline{
                 echo "Tomando el Artefacto inmutable (.jar) de la bóveda..."
                 echo "Enviando al servidor de Produccion"
                 sh 'sleep 5'
-                echo "Despliegue Exitoso El Motor de Deciciones está en línea"
+                echo "Despliegue Exitoso El Motor de Decisiones está en línea"
             }
         }
     }
