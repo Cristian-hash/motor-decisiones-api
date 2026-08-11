@@ -13,6 +13,15 @@ pipeline{
                 sh './mvnw test'
             }
         }
+        stage('Deploy'){
+            steps {
+                echo "Iniciando Simulacro de Despliegue (Continuos Delivery)"
+                echo "Tomando el Artefacto inmutable (.jar) de la bóveda..."
+                echo "Enviando al servidor de Produccion"
+                sh 'sleep 5'
+                echo "Despliegue Exitoso El Motor de Deciciones está en línea"
+            }
+        }
     }
         post{
             success{
