@@ -434,6 +434,19 @@ Cada una evoluciona de forma independiente.
 
 ---
 
+# 🚀 Integración y Entrega Continua (CI/CD)
+
+El proyecto implementa una canalización automatizada (Pipeline) definida como Infraestructura como Código (`Jenkinsfile`) operada por **Jenkins** dentro de un entorno aislado con **Docker**. Este enfoque elimina el error humano en los despliegues garantizando que *"el código asume, pero el pipeline garantiza"*.
+
+El flujo de automatización actúa como una aduana estricta de 4 fases:
+
+1. **Vigilancia:** Jenkins intercepta los eventos del repositorio de forma automática.
+2. **Ensamblaje y Resiliencia:** Compilación determinista mediante Maven, gestionando permisos nativos de Linux (`chmod +x`) y estandarizando la codificación a un formato universal (`UTF-8`) para evitar caída por caracteres especiales.
+3. **Aduana de Calidad (Test):** Ejecución de pruebas unitarias con JUnit y Mockito en memoria RAM. Se aísla deliberadamente la base de datos para auditar exclusivamente la lógica de negocio pura.
+4. **Empaquetado y Delivery:** Si el código supera la aduana, el sistema genera y archiva un **Artefacto Inmutable** (un *Fat Jar* con servidor Tomcat incrustado) y realiza un simulacro de entrega continua, dejándolo listo para su despliegue en la Nube.
+
+---
+
 # 🚦 Infraestructura Local
 
 ## 1. Clonar el proyecto
@@ -546,7 +559,7 @@ El backend:
 
 ## Próximas etapas
 
-- [ ] CI/CD
+- [x] CI/CD
 - [ ] Despliegue en la nube
 - [ ] Observabilidad
 - [ ] Monitoreo
