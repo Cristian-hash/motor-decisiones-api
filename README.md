@@ -557,14 +557,11 @@ El backend:
 - [x] Seguridad JWT
 - [x] Arquitectura Orientada a Eventos (Apache Kafka)
 
-## Próximas etapas
-
-- [x] CI/CD
-- [ ] Despliegue en la nube
-- [ ] Observabilidad
-- [ ] Monitoreo
-- [ ] Pruebas de carga
-
+#### Próximas etapas
+- [x] CI/CD (Jenkins & Docker)
+- [x] Arquitectura Cloud: Estrategia PaaS y Resource Groups en Azure
+- [ ] Despliegue en la nube (Backend & Frontend)
+- [ ] Observabilidad y Monitoreo
 ---
 
 # ✍️ Autor
