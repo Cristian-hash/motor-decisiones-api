@@ -560,6 +560,7 @@ El backend:
 #### Próximas etapas
 - [x] CI/CD (Jenkins & Docker)
 - [x] Arquitectura Cloud: Estrategia PaaS y Resource Groups en Azure
+- [x] Base de Datos Cloud: Despliegue de PostgreSQL Flexible Server y protección de Firewall (CGNAT)
 - [ ] Despliegue en la nube (Backend & Frontend)
 - [ ] Observabilidad y Monitoreo
 ---
