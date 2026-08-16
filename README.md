@@ -444,7 +444,7 @@ El flujo de automatización actúa como una aduana estricta de 4 fases:
 2. **Ensamblaje y Resiliencia:** Compilación determinista mediante Maven, gestionando permisos nativos de Linux (`chmod +x`) y estandarizando la codificación a un formato universal (`UTF-8`) para evitar caída por caracteres especiales.
 3. **Aduana de Calidad (Test):** Ejecución de pruebas unitarias con JUnit y Mockito en memoria RAM. Se aísla deliberadamente la base de datos para auditar exclusivamente la lógica de negocio pura.
 4. **Empaquetado y Delivery:** Si el código supera la aduana, el sistema genera y archiva un **Artefacto Inmutable** (un *Fat Jar* con servidor Tomcat incrustado) y realiza un simulacro de entrega continua, dejándolo listo para su despliegue en la Nube.
-
+   "El despliegue del Frontend (Angular) está 100% automatizado mediante GitHub Actions y Azure Static Web Apps (CDN), garantizando alta disponibilidad global y tiempos de carga mínimos."
 ---
 
 # 🚦 Infraestructura Local
@@ -561,7 +561,7 @@ El backend:
 - [x] CI/CD (Jenkins & Docker)
 - [x] Arquitectura Cloud: Estrategia PaaS y Resource Groups en Azure
 - [x] Base de Datos Cloud: Despliegue de PostgreSQL Flexible Server y protección de Firewall (CGNAT)
-- [ ] Despliegue en la nube (Backend & Frontend)
+- [x] Despliegue en la nube (Backend & Frontend)
 - [ ] Observabilidad y Monitoreo
 ---
 
