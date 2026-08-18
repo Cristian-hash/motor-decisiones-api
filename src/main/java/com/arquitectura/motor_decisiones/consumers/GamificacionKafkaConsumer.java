@@ -15,8 +15,8 @@ public class GamificacionKafkaConsumer{
                 this.logrosService=logrosService;
                 this.objectMapper=objectMapper;
     }
-
-    @KafkaListener(topics = "gamificacion-topic",groupId = "tesis-group")
+    // APAGADO TEMPORAL PARA LA NUBE: Evitamos que Spring cree el hilo que busca el puerto 9092
+    //@KafkaListener(topics = "gamificacion-topic",groupId = "tesis-group")
     public void escucharEventoGamificacion(String mensajeJson){
         System.out.println("=========================================");
         System.out.println("📥 [KAFKA CONSUMER] Mensaje atrapado desde la nube:");
