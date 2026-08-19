@@ -9,6 +9,11 @@ import com.arquitectura.motor_decisiones.repository.PatronRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+//Azure
+import com.arquitectura.motor_decisiones.entity.Usuario;
+import com.arquitectura.motor_decisiones.repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 
 @Configuration
@@ -17,8 +22,20 @@ public class DataSeeder {
     CommandLineRunner initData(
             PatronRepository patronRepository,
             LeccionRepository leccionRepository,
-            OpcionRespuestaRepository opcionRespuestaRepository) {
+            OpcionRespuestaRepository opcionRespuestaRepository,
+            //AZURE
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         return args -> {
+            //1. SEMBRAR USUARIO MAESTRO (Si la tabla esta vacia)
+            if(usuarioRepository.count()==0){
+                Usuario admin = new Usuario();
+                admin.setEmail("arquitecto@tesis.com");
+                admin.setPassword(passwordEncoder.encode("123456"));
+                usuarioRepository.save(admin);
+                System.out.println("Usuario maestro sembrado con exito");
+            }
             // Regla de oro: Solo inyectar si la base de datos está vacía
             if (patronRepository.count() > 0) {
                 return;
