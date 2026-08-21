@@ -2,6 +2,7 @@ package com.arquitectura.motor_decisiones.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -18,10 +19,15 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,AuthenticationProvider authenticationProvider) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.authenticationProvider =authenticationProvider;
     }
+
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -45,6 +51,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                // 4. Contratamos al equipo tactico. Le decimos a Spring que use nuestra BD.
+                .authenticationProvider(authenticationProvider)
                 // 4. Mandamos al Guardia a su puesto de trabajo
                 // Ponemos nuestro JwtAuthenticationFilter JUSTO ANTES del filtro estándar de Spring
                 // (UsernamePasswordAuthenticationFilter) para que intercepte y valide el token primero.
