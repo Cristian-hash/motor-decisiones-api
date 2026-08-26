@@ -29,7 +29,6 @@ public class AuthService {
             );
 
 
-
             Usuario usuario = usuarioRepository.findByEmail(request.email())
                     .orElseThrow(()-> new RuntimeException("Credenciales inválidas"));
 
