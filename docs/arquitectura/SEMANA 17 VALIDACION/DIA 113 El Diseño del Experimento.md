@@ -153,24 +153,60 @@ Esta métrica permitirá analizar especialmente el efecto de:
 - Otras estrategias de recompensa.
 
 ---
+# 3. Métrica de Fricción (Cualitativa y Analítica)
 
-# 3. Relación entre ambas métricas
+## Objetivo
 
-Las dos métricas evalúan dimensiones diferentes:
+Registrar y analizar **los errores más comunes al intentar aplicar patrones de diseño**.
+
+Esta métrica analítica busca determinar si los estudiantes están fallando por falta de comprensión del concepto o si la lección necesita ajustes para no inducir al error. El objetivo no es impresionar con velocidad de respuestas, sino auditar la claridad en la toma de decisiones.
+
+## ¿Qué se medirá?
+
+Se analizará exactamente qué botón (opción) presionó el usuario cuando falló.
+
+El dato principal corresponde al campo:
+
+`opcion_elegida_id` **(Llave Foránea)**
+
+Este campo pertenece a la tabla:
+
+`Progreso`
+
+## Regla de medición
+
+Se auditará la tabla `Progreso` para identificar los patrones de error, agrupando y contabilizando las respuestas incorrectas más frecuentes.
+
+### Ejemplo de interpretación
+
+Aplicando el principio de que *"el error es solo información: lo analizamos, aprendemos y avanzamos"*:
+
+*   Si la base de datos revela que la mayoría eligió "Fuerza Bruta" en lugar de "Backtracking", el problema no recae en el estudiante.
+*   Es una señal arquitectónica de que la lección necesita un rediseño en su metáfora, justificación o *feedback* para despejar esa fricción.
+
+---
+
+# 4. Relación entre las tres métricas
+
+Las tres métricas evalúan dimensiones diferentes y complementarias del motor de decisiones:
 
 | Métrica | Qué mide | Campo | Tabla |
 |---|---|---|---|
 | Efectividad pedagógica | Capacidad de elegir correctamente | `decision_correcta` | `Progreso` |
 | Engagement | Interacción mediante recompensas | `puntos_experiencia` | `Usuario` |
+| Fricción | Naturaleza y tendencia de los errores | `opcion_elegida_id` | `Progreso` |
 
 ### Idea central
 
 **Efectividad pedagógica:**  
-¿El estudiante está aprendiendo y tomando decisiones correctas?
+¿El estudiante está aprendiendo y desarrollando el criterio para tomar decisiones correctas?
 
 **Engagement:**  
-¿El sistema está consiguiendo que el estudiante siga interactuando?
+¿El motor Strategy está consiguiendo que el estudiante mantenga el interés a través de las recompensas dinámicas?
 
-Ambas métricas permiten evaluar la experiencia desde dos perspectivas:
+**Fricción:**  
+Cuando el estudiante falla, ¿qué decisión errónea tomó exactamente y cómo podemos mejorar la lección?
 
-> **Aprendizaje + Motivación = Experiencia de aprendizaje gamificada**
+Las tres métricas integradas auditan el sistema en su totalidad:
+
+> **Aprendizaje + Motivación + Análisis del Error = Experiencia de aprendizaje inteligente y gamificada**> 
