@@ -1,0 +1,32 @@
+⏱️ Fase 1: La Preparación (Ahora mismo)
+1. Capturar (El Entorno):
+Abre tu libreta física o tu Notion. Títulalo Auditoría_Usuario_1. Escribe en grande tu regla inquebrantable de hoy: Silencio absoluto. No explico la interfaz. Si tienes que explicarle dónde hacer clic, el diseño visual falló, no el usuario. Copia la URL pública de tu Frontend en Azure y tenla lista en tu celular o enviada a tu propio correo.
+
+2. La Estrategia del "Beta Tester":
+No necesitas pedir un permiso formal a gerencia para esto. Vas a aprovechar los "tiempos muertos" de tu jornada:
+
+En el trabajo: Durante la hora del almuerzo, el refrigerio o un break para el café, acércate a un compañero de confianza. Dile simplemente: "Oye, necesito un favor de 5 minutos. ¿Puedes intentar usar esta página web? Actúa natural, como si la hubieras encontrado en Google".
+
+En casa: Si en el trabajo es imposible, guárdalo para cuando regreses y siéntate con un familiar o amigo. El perfil ideal es alguien que sepa usar una computadora, pero que no haya programado el sistema contigo.
+
+⏱️ Fase 2: La Ejecución (Durante el día)
+1. Construir (La Observación):
+Sienta a tu compañero frente a la pantalla con tu Azure Static Web App abierta. A partir de ese momento, te callas.
+
+Observa la fricción: ¿Se salta la metáfora sin leerla? ¿Entiende intuitivamente que debe elegir un botón de código? ¿Hace clic en textos que no son botones? Anota cada ceño fruncido en tu libreta.
+
+Observa la gamificación: Fíjate en su expresión cuando el Motor Strategy le asigna puntos o le lanza una alerta de error. ¿Lo motiva o le da igual?
+
+El Cierre: Cuando termine, entrégale inmediatamente tu enlace de Google Forms (creado en el Día 113) para que registre su retroalimentación en frío.
+
+2. Enseñar (El Cierre Cognitivo):
+Camino a casa o en un momento a solas, reflexiona y verbaliza tu hallazgo: "El software perfecto no existe si el usuario no sabe cómo usarlo. Observar esta interacción real me revela los puntos ciegos de mi arquitectura de frontend. De nada sirve un backend escalable en Java si la interfaz de Angular no guía al estudiante."
+
+
+⏱️ Fase 3: La Persistencia (Al volver a tu máquina)
+Abre tu terminal en la carpeta de documentación de tu proyecto y registra oficialmente este hito de investigación. Usamos el flag --allow-empty porque hoy estás versionando aprendizaje empírico, no líneas de código Java.
+
+Bash
+git commit --allow-empty -m "docs: registro de comportamiento y navegacion del usuario beta 1"
+git push origin main
+A continuación, copia y pega esta ficha exacta en tu Segundo Cerebro (Notion) para sellar el Ladrillo 115.
