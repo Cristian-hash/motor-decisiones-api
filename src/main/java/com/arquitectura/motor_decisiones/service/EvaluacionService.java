@@ -53,11 +53,14 @@ public class EvaluacionService {
         // 1. REGLA ANTIFRAUDE
         boolean yaAprobo = progresoRepository.existsByUsuarioIdAndLeccionIdAndCompletadoTrue(
                 dto.usuarioId(), dto.leccionId());
+
+        /**
         if (yaAprobo) {
             throw new LeccionYaCompletadaException(
                     "FRAUDE DETECTADO: El usuario " + dto.usuarioId() + "ya completo con éxito la lección" + dto.leccionId() + ". No se permiten puntos duplicados."
             );
         }
+         **/
 
         // 2. EXTRAER DATOS
         Usuario usuario = usuarioRepository.findById(dto.usuarioId()).
