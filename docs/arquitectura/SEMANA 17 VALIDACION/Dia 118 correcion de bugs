@@ -1,0 +1,19 @@
+Es una Doble Barrera Arquitectónica. En lugar de que el servidor estalle cuando un estudiante intenta hacer trampa o repite una acción inválida, el sistema actúa como un "Traductor de la ONU". Atrapa el grito de pánico del servidor, lo traduce a un mensaje de texto amable y estructurado (JSON), y se lo entrega al frontend para que este solo lo lea y lo muestre en pantalla.
+
+Cómo funciona
+Intento Inválido: El estudiante intenta enviar una respuesta a una lección ya completada.
+
+Evaluación (El Juez): El servicio de Spring Boot detecta la infracción y lanza una excepción técnica (LeccionYaCompletadaException).
+
+Traducción (El Orquestador Global): El @ControllerAdvice en el backend intercepta la excepción en el aire y la empaqueta en un formato universal JSON con código HTTP 409 Conflict.
+
+Recepción (El Cliente Ciego): Angular recibe el paquete 409. No cuestiona ni recalcula nada; simplemente extrae el campo message ("Ya has completado esta lección") y dibuja la tarjeta de retroalimentación en la pantalla del estudiante.
+
+Responsabilidades y Arquitectura
+Sistema: Motor de Decisiones (Backend) y Plataforma Gamificada (Frontend).
+
+Lógica (El dueño real): @ControllerAdvice (Spring Boot). Es el único que conoce la regla inmutable y redacta el mensaje de error final. No debe cambiar si mañana decidimos usar React en lugar de Angular.
+
+Orquestador (Quien solo delega): leccion.component.ts (Angular). Delega la seguridad al backend y se limita a obedecer la orden de mostrar el mensaje en rojo o verde.
+
+Datos (Quien transporta): El objeto JSON de Error. Transporta el código de estado (409) y la justificación de un lado al otro.
