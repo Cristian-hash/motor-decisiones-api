@@ -16,4 +16,4 @@ Lógica (El dueño real): @ControllerAdvice (Spring Boot). Es el único que cono
 
 Orquestador (Quien solo delega): leccion.component.ts (Angular). Delega la seguridad al backend y se limita a obedecer la orden de mostrar el mensaje en rojo o verde.
 
-Datos (Quien transporta): El objeto JSON de Error. Transporta el código de estado (409) y la justificación de un lado al otro.
+Datos (Quien transporta): El objeto JSON de Error. Transporta el código de estado (409) y la justificación de un lado al otro.exit
