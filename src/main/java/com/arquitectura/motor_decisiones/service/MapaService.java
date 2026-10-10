@@ -20,7 +20,6 @@ public class MapaService {
     }
 
     public List<NivelMapaDTO> obtenerMapaDelUsuario(Long usuarioId) {
-        Long ultimaLeccionCompletada = progresoRepository.findUltimaLeccionCompletada(usuarioId);
         List<Patron> patrones = patronRepository.findAll();
         List<NivelMapaDTO> mapa = new ArrayList<>();
 
@@ -29,16 +28,35 @@ public class MapaService {
         for (Patron patron : patrones) {
             Long idPatron = patron.getId();
 
-            // Extraemos dinámicamente la primera lección que le pertenece a este patrón
-            Long leccionInicial = patron.getLecciones().isEmpty() ? 1L : patron.getLecciones().get(0).getId();
+            // 1. Extraemos la ruta completa y la ordenamos matemáticamente
+            List<Long> rutaOriginal = patron.getLecciones().stream()
+                    .map(leccion -> leccion.getId())
+                    .sorted()
+                    .toList();
+
+            // 2. EL FILTRO INTELIGENTE: Creamos una nueva mochila solo para lecciones pendientes
+            List<Long> rutaPendiente = new ArrayList<>();
+            for (Long idLeccion : rutaOriginal) {
+                // Consultamos si esta lección específica ya fue ganada
+                boolean superada = progresoRepository.existsByUsuarioIdAndLeccionIdAndCompletadoTrue(usuarioId, idLeccion);
+
+                // Si NO está superada, la agregamos a los retos pendientes
+                if (!superada) {
+                    rutaPendiente.add(idLeccion);
+                }
+            }
+
+            // 3. El viaje iniciará en el primer reto que falte
+            Long leccionInicial = rutaPendiente.isEmpty() ? 0L : rutaPendiente.get(0);
 
             String estado;
             String icono;
 
-            if (leccionInicial <= ultimaLeccionCompletada) {
+            // 4. Nueva regla absoluta: Si ya no hay retos pendientes, el nivel entero está completado
+            if (rutaPendiente.isEmpty() && !rutaOriginal.isEmpty()) {
                 estado = "COMPLETADO";
                 icono = "⭐";
-            } else if (!encontramosElActivo) {
+            } else if (!encontramosElActivo && !rutaOriginal.isEmpty()) {
                 estado = "ACTIVO";
                 icono = "🚀";
                 encontramosElActivo = true;
@@ -47,7 +65,8 @@ public class MapaService {
                 icono = "🔒";
             }
 
-            mapa.add(new NivelMapaDTO(idPatron, patron.getNombre(), leccionInicial, estado, icono));
+            // 5. Enviamos a Angular ÚNICAMENTE la ruta de pendientes
+            mapa.add(new NivelMapaDTO(idPatron, patron.getNombre(), leccionInicial, estado, icono, rutaPendiente));
         }
         return mapa;
     }
