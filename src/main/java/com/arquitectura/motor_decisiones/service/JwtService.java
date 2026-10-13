@@ -59,7 +59,7 @@ public class JwtService {
         return extractClaim(token,Claims::getExpiration);
     }
 
-    // Método maestro para decodificar cualquier dato del Payload
+    // Metodo maestro para decodificar cualquier dato del Payload
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         //La licuadora matemática dentro de Jwts.parserBuilder(). Este componente posee la inteligencia para triturar los ingredientes, aplicar la llave secreta y comparar los sabores finales.
         final Claims claims = Jwts.parserBuilder()
