@@ -23,4 +23,12 @@ Quédate con este esquema mental:
 RECIBIR → DELEGAR → RESPONDER
 Recibir: el controlador acepta los datos mediante @RequestBody.
 Delegar: el servicio ejecuta la lógica de evaluación.
-Responder: ResponseEntity.ok() devuelve el resultado con estado HTTP 200.
+Responder: ResponseEntity.ok() devuelve el resultado cmon estado HTTP 200.
+
+3-Si mi aplicación recibe 10,000 usuarios ahora mismo, ¿qué pieza cedería primero bajo la presión?
+
+La pieza más frágil siempre será el componente que guarda datos físicos permanentemente debido a las limitaciones de conexiones y a los bloqueos de escritura.
+
+Basándonos en este análisis arquitectónico, tu sospecha sobre el Servicio requiere una pequeña corrección. El Servicio procesa reglas puras en memoria sumamente rápido 
+y resiste excelentemente la presión. El componente que cedería primero bajo la carga de 10,000 usuarios simultáneos es la Base de Datos (Repository), seguida muy de cerca por los límites de conexión del Orquestador (Controller).
+
