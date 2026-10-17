@@ -1,0 +1,2 @@
+DÍA 122 (Miércoles): Defensa de Patrones y Lógica de Negocio
+Prepara la defensa de tu código. ¿Por qué descartaste usar un simple switch o if/else gigantesco para evaluar las respuestas? Pensar como un ingeniero requiere alejarse del código y observar los problemas desde un punto de abstracción alto. Identifica por qué un "switch" limita tu crecimiento y por qué separar los manuales protege tu sistema.
