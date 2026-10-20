@@ -1,0 +1,57 @@
+flowchart LR
+
+    subgraph RECEPCION["1. Recepción · quien delega"]
+        direction TB
+        entrada[/DTO de entrada<br/>RespuestaEstudianteDTO/]
+        controller["Orquestador<br/>EvaluacionController<br/>Recibe y delega: cero cálculos"]
+
+        entrada --> controller
+    end
+
+    subgraph CEREBRO["2. Cerebro · coordinación y reglas"]
+        direction TB
+        factory[["Almacén / Factory<br/>EvaluacionFactory<br/>Elige la estrategia correcta"]]
+        service["Coordinador de lógica<br/>EvaluacionService<br/>Coordina, pero no califica"]
+        estrategia["Interfaz Strategy<br/>EstrategiaEvaluacion<br/>evaluar()"]
+
+        subgraph ESTRATEGIAS["Reglas puras · estrategias concretas"]
+            direction LR
+            opcion["Manual<br/>Opción múltiple"]
+            codigo["Manual<br/>Código"]
+            arquitectura["Manual<br/>Arquitectura"]
+        end
+
+        service -->|"2. Solicita la estrategia según el tipo"| factory
+        factory -->|"3. Devuelve una estrategia"| service
+        service -->|"4. Invoca evaluar()"| estrategia
+
+        opcion -. "implementa" .-> estrategia
+        codigo -. "implementa" .-> estrategia
+        arquitectura -. "implementa" .-> estrategia
+    end
+
+    subgraph DATOS["3. Transporte y archivo · datos"]
+        direction TB
+        salida[/DTO de salida<br/>FeedbackDTO / Resultado/]
+        repositorio["Repositorio<br/>Guarda el progreso"]
+        baseDatos[("Base de datos<br/>Almacenamiento persistente")]
+
+        salida --> repositorio --> baseDatos
+    end
+
+    controller -->|"1. Pide evaluar"| service
+    service -->|"5. Devuelve el resultado"| salida
+
+    classDef recepcion fill:#EAF2FF,stroke:#2563EB,stroke-width:2px,color:#172554;
+    classDef logica fill:#F3E8FF,stroke:#7C3AED,stroke-width:2px,color:#3B0764;
+    classDef contrato fill:#FFFFFF,stroke:#7C3AED,stroke-width:2px,color:#3B0764;
+    classDef regla fill:#F0FDF4,stroke:#16A34A,stroke-width:2px,color:#14532D;
+    classDef datos fill:#FFF7ED,stroke:#EA580C,stroke-width:2px,color:#7C2D12;
+
+    class entrada,controller recepcion;
+    class factory,service logica;
+    class estrategia contrato;
+    class opcion,codigo,arquitectura regla;
+    class salida,repositorio,baseDatos datos;
+
+    style ESTRATEGIAS fill:#F8FFFB,stroke:#16A34A,stroke-width:2px;
