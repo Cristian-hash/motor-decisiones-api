@@ -1,0 +1,43 @@
+flowchart TD
+    %% Definición de Estilos del Arquitecto
+    classDef iaas fill:#7f8c8d,stroke:#ffffff,stroke-width:2px,color:#ffffff,stroke-dasharray: 5 5;
+    classDef paas fill:#27ae60,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef vitrina fill:#8e44ad,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef cerebro fill:#0078d4,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef boveda fill:#16a085,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef firewall fill:#c0392b,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef github fill:#2c3e50,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+
+    subgraph DECISION ["⚖️ 1. DECISIÓN ARQUITECTÓNICA: ¿Por qué PaaS y no IaaS?"]
+        direction LR
+        I1["❌ IaaS (Máquina Virtual Vacía)<br/>• Eres dueño y conserje del servidor<br/>• Pierdes horas instalando Ubuntu, Java y parches<br/>• Mantenimiento manual doloroso"]:::iaas
+
+        P1["✅ PaaS (Plataforma como Servicio - Elegido)<br/>• Azure administra el SO Linux, hardware y parches<br/>• Tú solo entregas el Artefacto (.jar y dist/)<br/>• 100% enfoque en las reglas de negocio de la tesis"]:::paas
+
+        I1 -. "Descartado por carga operativa" .-> P1
+    end
+
+    subgraph RG ["📦 GRUPO DE RECURSOS: rg-tesis-arquitectura (Perímetro Lógico en Azure)"]
+        direction TB
+
+        subgraph CAPA1 ["🖼️ CAPA 1: LA VITRINA (Frontend - Distribución Global)"]
+            GH["🤖 Robot GitHub Actions (.yml)<br/>Detecta git push y ejecuta ng build en la nube"]:::github
+            SWA["🌍 Azure Static Web Apps (CDN Global - Plan Free)<br/>• Aloja carpeta estática: dist/frontend-tesis/browser<br/>• No gasta CPU de servidor (Solo ancho de banda)<br/>• Entrega HTML/CSS/JS en milisegundos"]:::vitrina
+            GH -- "Publica carpeta dist/" --> SWA
+        end
+
+        subgraph CAPA2 ["🧠 CAPA 2: EL CEREBRO (Backend - Cómputo Administrado)"]
+            APP["⚙️ Azure App Service (PaaS Linux + Java 21 SE)<br/>• Ubicación: Central US (Plan Free F1)<br/>• Ejecuta motor-decisiones-0.0.1-SNAPSHOT.jar (Tomcat embebido)<br/>• Inyecta en RAM: SPRING_PROFILES_ACTIVE=prod, DB_URL, DB_PASSWORD, JWT_SECRET"]:::cerebro
+        end
+
+        subgraph CAPA3 ["🗄️ CAPA 3: LA BÓVEDA (Persistencia - Datos Desacoplados)"]
+            FW{"🛡️ Firewall Perimetral de Azure<br/>Lista VIP de IPs + Permiso interno Azure"}:::firewall
+            DB[("🐘 Azure Database for PostgreSQL<br/>(Flexible Server - Standard_B1ms)<br/>• Ubicación: Central US (Discos SSD redundantes)<br/>• Alta disponibilidad e independencia de tu PC local")]:::boveda
+            FW -- "Puerto 5432 Autorizado" --> DB
+        end
+
+        SWA == "Petición HTTP + Token JWT<br/>(Autorizado por CORS en SecurityConfig)" ==> APP
+        APP == "Conexión JDBC en la misma región (Central US)<br/>Latencia mínima (Milisegundos)" ==> FW
+    end
+
+    P1 ==> RG

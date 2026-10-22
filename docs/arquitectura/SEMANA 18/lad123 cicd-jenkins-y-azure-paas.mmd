@@ -1,0 +1,51 @@
+flowchart TD
+    %% Definición de Estilos del Arquitecto
+    classDef git fill:#2c3e50,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef jenkins fill:#2980b9,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef test fill:#27ae60,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef jar fill:#8e44ad,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef boveda fill:#f39c12,stroke:#ffffff,stroke-width:2px,color:#000000;
+    classDef azure fill:#0078d4,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef db fill:#16a085,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+
+    subgraph ORIGEN ["💻 0. LA RECETA (Código Fuente)"]
+        G1["Git Push a GitHub (Rama main)<br/>Código Java + Jenkinsfile + Angular"]:::git
+    end
+
+    subgraph FABRICA ["🏭 LA ANATOMÍA DE TU FÁBRICA (Pipeline CI/CD en Jenkins)"]
+        direction TB
+        S1["🛠️ Estación 1: Permiso e Idioma (Build)<br/>• chmod +x mvnw (Autoriza ejecución en Linux)<br/>• -Dfile.encoding=UTF-8 (Evita choque de caracteres)"]:::jenkins
+
+        S2{"🛡️ Estación 2: Aduana en RAM (Test)<br/>• JUnit 5 + Mockito (EvaluacionServiceTest: 4/4 en verde)<br/>• Silencia contextLoads (Sin dependencia de DB local)"}:::test
+
+        S3["🎂 Estación 3: El Pastel Sellado (Artefacto)<br/>• Genera Fat Jar: motor-decisiones-0.0.1-SNAPSHOT.jar<br/>• Lleva su propio servidor Tomcat incrustado"]:::jar
+
+        S4["🏦 Estación 4: La Bóveda (post success)<br/>• archiveArtifacts guarda el .jar bajo llave<br/>• Registra huella digital (fingerprint) inmutable"]:::boveda
+
+        S1 --> S2
+        S2 -- "✅ 100% Verde" --> S3 --> S4
+    end
+
+    subgraph CLOUD ["☁️ INFRAESTRUCTURA EN MICROSOFT AZURE PaaS (rg-tesis-arquitectura)"]
+        direction LR
+
+        subgraph VITRINA ["🖼️ 1. LA VITRINA (Frontend)"]
+            A1["Azure Static Web Apps (CDN Global)<br/>• Robot GitHub Actions ejecuta ng build<br/>• Sirve carpeta estática dist/ en milisegundos"]:::azure
+        end
+
+        subgraph CEREBRO ["🧠 2. EL CEREBRO (Backend)"]
+            A2["Azure App Service (Linux + Java 21 SE)<br/>• Ejecuta el Artefacto .jar inmutable<br/>• Inyecta secretos en RAM: DB_URL, DB_PASSWORD, JWT_SECRET"]:::azure
+        end
+
+        subgraph PERSISTENCIA ["🗄️ 3. LA BÓVEDA CLOUD (Datos)"]
+            A3[("Azure Database for PostgreSQL<br/>(Flexible Server - Central US)<br/>• Protegida por Firewall y sin claves en Git")]:::db
+        end
+
+        A1 -- "Petición HTTP + Interceptor JWT<br/>(Autorizado por CORS)" --> A2
+        A2 -- "Conexión JDBC segura<br/>(Latencia mínima)" --> A3
+    end
+
+    %% Conexiones Globales
+    G1 -- "Descarga Jenkinsfile" --> S1
+    G1 -- "Dispara Webhook" --> A1
+    S4 == "Despliega el Pastel Sellado (.jar)" ==> A2

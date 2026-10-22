@@ -1,0 +1,38 @@
+flowchart TD
+    %% Definición de Estilos del Arquitecto
+    classDef publico fill:#2980b9,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef firma fill:#27ae60,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef ataque fill:#c0392b,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+    classDef aduana fill:#f39c12,stroke:#ffffff,stroke-width:2px,color:#000000;
+
+    subgraph VERDAD ["🧠 LA VERDAD CRIPTOGRÁFICA (Codificar vs. Firmar)"]
+        direction LR
+
+        subgraph IZQUIERDA ["📖 LADO IZQUIERDO: Base64 (Header y Payload)"]
+            B1["📦 Traducción pública para viajar por HTTP<br/>(NO es encriptación)"]:::publico
+            B2["🔍 Visible por cualquiera<br/>Se lee fácil con jwt.io o atob()"]:::publico
+            B3["⚠️ REGLA DE ORO:<br/>Jamás guardar contraseñas aquí"]:::publico
+            B1 --> B2 --> B3
+        end
+
+        subgraph DERECHA ["🛡️ LADO DERECHO: HMAC SHA-256 (Firma)"]
+            F1["🔏 Sello de Agua del Servidor<br/>Fórmula: Header + Payload + jwt.secret"]:::firma
+            F2["✅ Garantiza Integridad y Autenticidad<br/>Nadie puede alterar los datos sin la llave"]:::firma
+            F1 --> F2
+        end
+    end
+
+    subgraph FRONTERA ["🚨 RELACIÓN DEL ATAQUE (El Muro de Defensa)"]
+        H1["🦹‍♂️ 1. El Ataque en el Payload<br/>Hacker cambia rol de ESTUDIANTE a ADMIN"]:::ataque
+        H2["🔑 2. El Límite del Atacante<br/>No tiene el jwt.secret para fabricar el nuevo sello"]:::ataque
+        G1{"💂‍♂️ 3. JwtAuthenticationFilter<br/>Recalcula la firma en la puerta"}:::aduana
+        E1["💥 4. Lanza SignatureException<br/>Detecta que el sello matemático se rompió"]:::ataque
+        E2["🚫 5. Rechazo en la Puerta (HTTP 401)<br/>Devuelve JSON limpio sin tocar el Controller"]:::ataque
+
+        H1 --> H2 --> G1
+        G1 -- "¡Las firmas NO coinciden!" --> E1 --> E2
+    end
+
+    %% Conexiones entre la teoría y el ataque real
+    B2 -. "Permite leer y editar el texto" .-> H1
+    F2 -. "Desencadena la validación con jwt.secret" .-> G1
