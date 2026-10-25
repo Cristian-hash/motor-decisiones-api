@@ -1,0 +1,47 @@
+flowchart TD
+%% Estilos del Arquitecto
+classDef humano fill:#2c3e50,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+classDef cerebro fill:#2980b9,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+classDef strategy fill:#8e44ad,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+classDef kafka fill:#d35400,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+classDef consumer fill:#27ae60,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+classDef db fill:#16a085,stroke:#ffffff,stroke-width:2px,color:#ffffff;
+
+    subgraph HABITO ["🧠 1. EL CICLO HUMANO (Hackeando el Hábito)"]
+        U1["👨‍🎓 Estudiante (Rol Activo)<br/>Analiza Metáfora + Código y toma Decisión"]:::humano
+        UI["💻 Angular (Estado Reactivo con Signals)<br/>• Muestra FeedbackDTO instantáneo (Dopamine Hit)<br/>• Gestiona 5 Corazones y Cola de Repetición Espaciada"]:::humano
+    end
+
+    subgraph MOTOR ["⚙️ 2. MOTOR DE DECISIONES (Tiempo Real / Síncrono)"]
+        EV["🧠 EvaluacionService (Coordinador)<br/>Evalúa respuesta y registra intento inmutable (INSERT)"]:::cerebro
+        ST{"🎮 CalculadoraPuntosStrategy<br/>• PuntosNormalStrategy (10 XP)<br/>• PuntosRachaStrategy (20 XP)<br/>• Regla Anti-Fuerza Bruta (-5 XP)"}:::strategy
+        PUB["📢 Interfaz EventPublisher<br/>Adaptador: KafkaEventPublisher + ObjectMapper"]:::cerebro
+    end
+
+    subgraph BROKER ["📡 3. RUPTURA DEL TIEMPO (Apache Kafka - Asíncrono)"]
+        KF[["🔥 Broker Apache Kafka (Puerto 9092)<br/>Tópico: gamificacion-topic<br/>Retiene el JSON en disco (Tolerancia a Fallos)"]]:::kafka
+    end
+
+    subgraph LOGROS ["🏆 4. DOMINIO DE GAMIFICACIÓN (Consumidor Desacoplado)"]
+        CON["🎧 GamificacionKafkaConsumer<br/>@KafkaListener (groupId = 'tesis-group')<br/>Deserializa JSON a LeccionCompletadaEvent"]:::consumer
+        LS["🥇 LogrosService<br/>Evalúa reglas de medallas y desbloquea insignias"]:::consumer
+    end
+
+    subgraph BOVEDA ["🗄️ 5. LA CAJA NEGRA (Persistencia y Telemetría)"]
+        DB[("🐘 PostgreSQL<br/>• Tabla Progreso: decision_correcta, opcion_elegida_id<br/>• Tabla Usuario: puntos_experiencia e insignias")]:::db
+    end
+
+    %% Flujo Síncrono
+    U1 -- "1. Envía Decisión (DTO)" --> EV
+    EV -- "2. Calcula Recompensa Dinámica" --> ST
+    ST -- "Devuelve XP" --> EV
+    EV -- "3. Guarda Historial (Append-Only)" --> DB
+    EV -- "4. Devuelve 200 OK + FeedbackDTO" --> UI
+    UI -- "5. Refuerza el hábito o encola repaso" --> U1
+
+    %% Flujo Asíncrono (Eventos)
+    EV -. "6. Emite LeccionCompletadaEvent (Pasado)" .-> PUB
+    PUB == "7. Serializa a JSON" ==> KF
+    KF == "8. Entrega mensaje cuando está disponible" ==> CON
+    CON -- "9. Traduce a Objeto Java" --> LS
+    LS -- "10. Otorga Insignia" --> DB
